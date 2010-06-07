@@ -4,44 +4,47 @@ abstruct sealed class id_or_imm()
 case class V(Id.t) extends id_or_imm
 case class C(int) extends id_or_imm
 
-type t = // 命令の列 (caml2html: sparcasm_t)
-  | Ans of exp
-  | Let of (Id.t * Type.t) * exp * t
-  | Forget of Id.t * t // Spillされた変数を、自由変数の計算から除外するための仮想命令 (caml2html: sparcasm_forget)
-and exp = // 一つ一つの命令に対応する式 (caml2html: sparcasm_exp)
-  | Nop
-  | Set of int
-  | SetL of Id.l
-  | Mov of Id.t
-  | Neg of Id.t
-  | Add of Id.t * id_or_imm
-  | Sub of Id.t * id_or_imm
-  | SLL of Id.t * id_or_imm
-  | Ld of Id.t * id_or_imm
-  | St of Id.t * Id.t * id_or_imm
-  | FMovD of Id.t
-  | FNegD of Id.t
-  | FAddD of Id.t * Id.t
-  | FSubD of Id.t * Id.t
-  | FMulD of Id.t * Id.t
-  | FDivD of Id.t * Id.t
-  | LdDF of Id.t * id_or_imm
-  | StDF of Id.t * Id.t * id_or_imm
-  | Comment of string
+sealed abstract class T // 命令の列 (caml2html: sparcasm_t)
+case class Ans(a:exp) extends T
+case class Let(a:(Id.t, Type.t), b:Exp, c:T) extends T
+case class Forget(a:Id.t, b:T) extends T // Spillされた変数を、自由変数の計算から除外するための仮想命令 (caml2html: sparcasm_forget)
+
+sealed abstract class Exp // 一つ一つの命令に対応する式 (caml2html: sparcasm_exp)
+case class Nop() extends Exp
+case class Set(a:int) extends Exp
+case class SetL(a:Id.l) extends Exp
+case class Mov(a:Id.t) extends Exp
+case class Neg(a:Id.t) extends Exp
+case class Add(a:Id.t, b:id_or_imm) extends Exp
+case class Sub(a:Id.t, b:id_or_imm) extends Exp
+case class SLL(a:Id.t, b:id_or_imm) extends Exp
+case class Ld(a:Id.t, b:id_or_imm) extends Exp
+case class St(a:Id.t, b:Id.t, c:id_or_imm) extends Exp
+case class FMovD(a:Id.t) extends Exp
+case class FNegD(a:Id.t) extends Exp
+case class FAddD(a:Id.t, b:Id.t) extends Exp
+case class FSubD(a:Id.t, b:Id.t) extends Exp
+case class FMulD(a:Id.t, b:Id.t) extends Exp
+case class FDivD(a:Id.t, b:Id.t) extends Exp
+case class LdDF(a:Id.t, b:id_or_imm) extends Exp
+case class StDF(a:Id.t, b:Id.t, c:id_or_imm) extends Exp
+case class Comment(a:string) extends Exp
   // virtual instructions
-  | IfEq of Id.t * id_or_imm * t * t
-  | IfLE of Id.t * id_or_imm * t * t
-  | IfGE of Id.t * id_or_imm * t * t // 左右対称ではないので必要
-  | IfFEq of Id.t * Id.t * t * t
-  | IfFLE of Id.t * Id.t * t * t
+case class IfEq(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp
+case class IfLE(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp
+case class IfGE(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp // 左右対称ではないので必要
+case class IfFEq(a:Id.t, b:Id.t, c:t, d:t) extends Exp
+case class IfFLE(a:Id.t, b:Id.t, c:t, d:t) extends Exp
   // closure address, integer arguments, and float arguments
-  | CallCls of Id.t * Id.t list * Id.t list
-  | CallDir of Id.l * Id.t list * Id.t list
-  | Save of Id.t * Id.t // レジスタ変数の値をスタック変数へ保存 (caml2html: sparcasm_save)
-  | Restore of Id.t // スタック変数から値を復元 (caml2html: sparcasm_restore)
-type fundef = { name : Id.l; args : Id.t list; fargs : Id.t list; body : t; ret : Type.t }
+case class CallCls(a:Id.t, b:List[Id.t], c:List[Id.t]) extends Exp
+case class CallDir(a:Id.l, b:List[Id.t], c:List[Id.t]) extends Exp
+case class Save(a:Id.t, b:Id.t) extends Exp // レジスタ変数の値をスタック変数へ保存 (caml2html: sparcasm_save)
+case class Restore(a:Id.t) extends Exp // スタック変数から値を復元 (caml2html: sparcasm_restore)
+
+case class Fundef(name:Id.l, args:List[Id.t], fargs:List[Id.t], body:T, ret:Type.t)
+
 // プログラム全体 = 浮動小数定数テーブル + トップレベル関数 + メインの式 (caml2html: sparcasm_prog)
-type prog = Prog of (Id.l * float) list * fundef list * t
+case class Prog(a:List[(Id.l, float)],b:List[Fundef],c:T)
 
 def fletd(x, e1, e2) = Let((x, Type.Float), e1, e2)
 def seq(e1, e2) = Let((Id.gentmp(Type.Unit), Type.Unit), e1, e2)
