@@ -1,6 +1,6 @@
 case class Closure(entry:Id.l, actual_fv:List[Id.t])
 
-abstract sealed class T() // ¥¯¥í¡¼¥¸¥ãÊÑ´¹¸å¤Î¼° (caml2html: closure_t)
+abstract sealed class T() // ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£å¤‰æ›å¾Œã®å¼ (caml2html: closure_t)
 case class Unit() extends T
 case class Int(a:int) extends T
 case class Float(a:float) extends T
@@ -53,7 +53,7 @@ def fv(e) = e match {
 
 var toplevel:List[Fundef] = List()
 
-// ¥¯¥í¡¼¥¸¥ãÊÑ´¹¥ë¡¼¥Á¥óËÜÂÎ (caml2html: closure_g)
+// ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£å¤‰æ›ãƒ«ãƒ¼ãƒãƒ³æœ¬ä½“ (caml2html: closure_g)
 def g(env, known, e) = e match {
 	case KNormal.Unit() => Unit()
 	case KNormal.Int(i) => Int(i)
@@ -70,45 +70,45 @@ def g(env, known, e) = e match {
 	case KNormal.IfLE(x, y, e1, e2) => IfLE(x, y, g(env,known,e1), g(env,known,e2))
 	case KNormal.Let((x, t), e1, e2) => Let((x, t), g(env,known,e1), g(M.add(x, t, env), known, e2))
 	case KNormal.Var(x) => Var(x)
-	case KNormal.LetRec(KNormal.Fundef((x, t),yts,e1), e2) => // ´Ø¿ôÄêµÁ¤Î¾ì¹ç (caml2html: closure_letrec)
-		// ´Ø¿ôÄêµÁlet rec x y1 ... yn = e1 in e2¤Î¾ì¹ç¤Ï¡¢
-		// x¤Ë¼«Í³ÊÑ¿ô¤¬¤Ê¤¤(closure¤ò²ð¤µ¤ºdirect¤Ë¸Æ¤Ó½Ð¤»¤ë)
-		// ¤È²¾Äê¤·¡¢known¤ËÄÉ²Ã¤·¤Æe1¤ò¥¯¥í¡¼¥¸¥ãÊÑ´¹¤·¤Æ¤ß¤ë *)
+	case KNormal.LetRec(KNormal.Fundef((x, t),yts,e1), e2) => // é–¢æ•°å®šç¾©ã®å ´åˆ (caml2html: closure_letrec)
+		// é–¢æ•°å®šç¾©let rec x y1 ... yn = e1 in e2ã®å ´åˆã¯ã€
+		// xã«è‡ªç”±å¤‰æ•°ãŒãªã„(closureã‚’ä»‹ã•ãšdirectã«å‘¼ã³å‡ºã›ã‚‹)
+		// ã¨ä»®å®šã—ã€knownã«è¿½åŠ ã—ã¦e1ã‚’ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£å¤‰æ›ã—ã¦ã¿ã‚‹ *)
 		val toplevel_backup = toplevel;
 		val envdash = M.add(x, t, env);
 		val knowndash = S.add(x, known);
 		val e1dash = g(M.add_list(yts, envdash), knowndash, e1);
-		// ËÜÅö¤Ë¼«Í³ÊÑ¿ô¤¬¤Ê¤«¤Ã¤¿¤«¡¢ÊÑ´¹·ë²Ìe1dash¤ò³ÎÇ§¤¹¤ë
-		// Ãí°Õ: e1dash¤Ëx¼«¿È¤¬ÊÑ¿ô¤È¤·¤Æ½Ð¸½¤¹¤ë¾ì¹ç¤Ïclosure¤¬É¬Í×!
-		// (thanks to nuevo-namasute and azounoman; test/cls-bug2.ml»²¾È)
+		// æœ¬å½“ã«è‡ªç”±å¤‰æ•°ãŒãªã‹ã£ãŸã‹ã€å¤‰æ›çµæžœe1dashã‚’ç¢ºèªã™ã‚‹
+		// æ³¨æ„: e1dashã«xè‡ªèº«ãŒå¤‰æ•°ã¨ã—ã¦å‡ºç¾ã™ã‚‹å ´åˆã¯closureãŒå¿…è¦!
+		// (thanks to nuevo-namasute and azounoman; test/cls-bug2.mlå‚ç…§)
 		val zs = S.diff(fv(e1dash), S.of_list(yts.map(fst)))
 		val (knowndash, e1dash) =
 			if (S.is_empty(zs)) {
 				(knowndash, e1dash)
 			} else {
-				// ÂÌÌÜ¤À¤Ã¤¿¤é¾õÂÖ(toplevel¤ÎÃÍ)¤òÌá¤·¤Æ¡¢¥¯¥í¡¼¥¸¥ãÊÑ´¹¤ò¤ä¤êÄ¾¤¹
+				// é§„ç›®ã ã£ãŸã‚‰çŠ¶æ…‹(toplevelã®å€¤)ã‚’æˆ»ã—ã¦ã€ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£å¤‰æ›ã‚’ã‚„ã‚Šç›´ã™
 				println("free variable(s) "+Id.pp_list(S.elements(zs))+" found in function "+x+"@.");
 				println("function "+x+" cannot be directly applied in fact@.");
 				toplevel = toplevel_backup;
 				val e1dash = g(M.add_list(yts, envdash), known, e1);
 				(known, e1dash)
 			}
-		// ¼«Í³ÊÑ¿ô¤Î¥ê¥¹¥È
+		// è‡ªç”±å¤‰æ•°ã®ãƒªã‚¹ãƒˆ
 		val zs = S.elements(S.diff(fv(e1dash)), S.add(x, S.of_list(yts.map(fst)) ) ;
 		
-		// ¤³¤³¤Ç¼«Í³ÊÑ¿ôz¤Î·¿¤ò°ú¤¯¤¿¤á¤Ë°ú¿ôenv¤¬É¬Í×
+		// ã“ã“ã§è‡ªç”±å¤‰æ•°zã®åž‹ã‚’å¼•ããŸã‚ã«å¼•æ•°envãŒå¿…è¦
 		val zts = zs.map(z => (z, M.find(z,envdash)) );
-		toplevel = Fundef((Id.L(x), t), yts, zts, e1dash) :: toplevel; // ¥È¥Ã¥×¥ì¥Ù¥ë´Ø¿ô¤òÄÉ²Ã
+		toplevel = Fundef((Id.L(x), t), yts, zts, e1dash) :: toplevel; // ãƒˆãƒƒãƒ—ãƒ¬ãƒ™ãƒ«é–¢æ•°ã‚’è¿½åŠ 
 		val e2dash = g(envdash,knowndash,e2);
 
-		// x¤¬ÊÑ¿ô¤È¤·¤Æe2dash¤Ë½Ð¸½¤¹¤ë¤«
+		// xãŒå¤‰æ•°ã¨ã—ã¦e2dashã«å‡ºç¾ã™ã‚‹ã‹
 		if (S.mem(x, fv(e2dash))) {
-			MakeCls((x, t), Closure(Id.L(x), zs), e2dash) // ½Ð¸½¤·¤Æ¤¤¤¿¤éºï½ü¤·¤Ê¤¤
+			MakeCls((x, t), Closure(Id.L(x), zs), e2dash) // å‡ºç¾ã—ã¦ã„ãŸã‚‰å‰Šé™¤ã—ãªã„
 		} else {
 			println("eliminating closure(s) "+x+"@.");
 			e2dash
-		} // ½Ð¸½¤·¤Ê¤±¤ì¤ÐMakeCls¤òºï½ü
-	case KNormal.App(x, ys) when S.mem x known => // ´Ø¿ôÅ¬ÍÑ¤Î¾ì¹ç (caml2html: closure_app)
+		} // å‡ºç¾ã—ãªã‘ã‚Œã°MakeClsã‚’å‰Šé™¤
+	case KNormal.App(x, ys) when S.mem x known => // é–¢æ•°é©ç”¨ã®å ´åˆ (caml2html: closure_app)
 		println("directly applying "+x+"@.");
 		AppDir(Id.L(x), ys)
 	case KNormal.App(f, xs) => AppCls(f, xs)

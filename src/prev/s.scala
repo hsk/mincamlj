@@ -1,4 +1,4 @@
-(* customized version of Set *)
+// customized version of Set
 
 module S =
   Set.Make
@@ -8,4 +8,4 @@ module S =
     end)
 include S
 
-let of_list l = List.fold_left (fun s e -> add e s) empty l
+def of_list(l) = List.fold_left(s(e) => add(e, s), empty, l)

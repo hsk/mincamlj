@@ -41,13 +41,13 @@ def findt(x, env) = M.find(x, env) match {
 	case _ => throw new Not_found
 }
 
-// ƒÍøÙæˆ§ﬂπ˛§ﬂ•Î°º•¡•ÛÀ‹¬Œ (caml2html: constfold_g)
+// ÂÆöÊï∞Áï≥„ÅøËæº„Åø„É´„Éº„ÉÅ„É≥Êú¨‰Ωì (caml2html: constfold_g)
 def g(env, e) = e match {
 	case Var(x) if (memi(x, env)) => Int(findi(x, env))
 	// case Var(x) if (memf(x, env)) => Float(findf(x, env))
 	// case Var(x) if (memt(x, env)) => Tuple(findt(x, env))
 	case Neg(x) if (memi(x, env)) => Int(-(findi(x, env)))
-	case Add(x, y) if (memi(x, env) && memi(y, env)) => Int(findi(x, env) + findi(y, env)) (* ¬≠§∑ªª§Œ•±°º•π (caml2html: constfold_add) *)
+	case Add(x, y) if (memi(x, env) && memi(y, env)) => Int(findi(x, env) + findi(y, env)) (* Ë∂≥„ÅóÁÆó„ÅÆ„Ç±„Éº„Çπ (caml2html: constfold_add) *)
 	case Sub(x, y) if (memi(x, env) && memi(y, env)) => Int(findi(x, env) - findi(y, env))
 	case FNeg(x) if (memf(x, env)) => Float(-.(findf(x, env)))
 	case FAdd(x, y) if (memf(x, env) && memf(y, env)) => Float(findf(x, env) + findf(y, env))
@@ -60,7 +60,7 @@ def g(env, e) = e match {
 	case IfLE(x, y, e1, e2) if (memi(x, env) && memi(y, env)) => if (findi(x, env) <= findi(y, env)) g(env, e1) else g(env, e2)
 	case IfLE(x, y, e1, e2) if (memf(x, env) && memf(y, env)) => if (findf(x, env) <= findf(y, env)) g(env, e1) else g(env, e2)
 	case IfLE(x, y, e1, e2) => IfLE(x, y, g(env, e1), g(env, e2))
-	case Let((x, t), e1, e2) => // let§Œ•±°º•π (caml2html: constfold_let)
+	case Let((x, t), e1, e2) => // let„ÅÆ„Ç±„Éº„Çπ (caml2html: constfold_let)
 		val e1dash = g(env, e1);
 		val e2dash = g(M.add(x, e1dash, env), e2);
 		Let((x, t), e1dash, e2dash)

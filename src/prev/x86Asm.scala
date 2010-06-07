@@ -4,12 +4,12 @@ abstruct sealed class id_or_imm()
 case class V(Id.t) extends id_or_imm
 case class C(int) extends id_or_imm
 
-sealed abstract class T // Ì¿Îá¤ÎÎó (caml2html: sparcasm_t)
+sealed abstract class T // å‘½ä»¤ã®åˆ— (caml2html: sparcasm_t)
 case class Ans(a:exp) extends T
 case class Let(a:(Id.t, Type.t), b:Exp, c:T) extends T
-case class Forget(a:Id.t, b:T) extends T // Spill¤µ¤ì¤¿ÊÑ¿ô¤ò¡¢¼«Í³ÊÑ¿ô¤Î·×»»¤«¤é½ü³°¤¹¤ë¤¿¤á¤Î²¾ÁÛÌ¿Îá (caml2html: sparcasm_forget)
+case class Forget(a:Id.t, b:T) extends T // Spillã•ã‚ŒãŸå¤‰æ•°ã‚’ã€è‡ªç”±å¤‰æ•°ã®è¨ˆç®—ã‹ã‚‰é™¤å¤–ã™ã‚‹ãŸã‚ã®ä»®æƒ³å‘½ä»¤ (caml2html: sparcasm_forget)
 
-sealed abstract class Exp // °ì¤Ä°ì¤Ä¤ÎÌ¿Îá¤ËÂĞ±ş¤¹¤ë¼° (caml2html: sparcasm_exp)
+sealed abstract class Exp // ä¸€ã¤ä¸€ã¤ã®å‘½ä»¤ã«å¯¾å¿œã™ã‚‹å¼ (caml2html: sparcasm_exp)
 case class Nop() extends Exp
 case class Set(a:int) extends Exp
 case class SetL(a:Id.l) extends Exp
@@ -32,18 +32,18 @@ case class Comment(a:string) extends Exp
   // virtual instructions
 case class IfEq(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp
 case class IfLE(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp
-case class IfGE(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp // º¸±¦ÂĞ¾Î¤Ç¤Ï¤Ê¤¤¤Î¤ÇÉ¬Í×
+case class IfGE(a:Id.t, b:id_or_imm, c:t, d:t) extends Exp // å·¦å³å¯¾ç§°ã§ã¯ãªã„ã®ã§å¿…è¦
 case class IfFEq(a:Id.t, b:Id.t, c:t, d:t) extends Exp
 case class IfFLE(a:Id.t, b:Id.t, c:t, d:t) extends Exp
   // closure address, integer arguments, and float arguments
 case class CallCls(a:Id.t, b:List[Id.t], c:List[Id.t]) extends Exp
 case class CallDir(a:Id.l, b:List[Id.t], c:List[Id.t]) extends Exp
-case class Save(a:Id.t, b:Id.t) extends Exp // ¥ì¥¸¥¹¥¿ÊÑ¿ô¤ÎÃÍ¤ò¥¹¥¿¥Ã¥¯ÊÑ¿ô¤ØÊİÂ¸ (caml2html: sparcasm_save)
-case class Restore(a:Id.t) extends Exp // ¥¹¥¿¥Ã¥¯ÊÑ¿ô¤«¤éÃÍ¤òÉü¸µ (caml2html: sparcasm_restore)
+case class Save(a:Id.t, b:Id.t) extends Exp // ãƒ¬ã‚¸ã‚¹ã‚¿å¤‰æ•°ã®å€¤ã‚’ã‚¹ã‚¿ãƒƒã‚¯å¤‰æ•°ã¸ä¿å­˜ (caml2html: sparcasm_save)
+case class Restore(a:Id.t) extends Exp // ã‚¹ã‚¿ãƒƒã‚¯å¤‰æ•°ã‹ã‚‰å€¤ã‚’å¾©å…ƒ (caml2html: sparcasm_restore)
 
 case class Fundef(name:Id.l, args:List[Id.t], fargs:List[Id.t], body:T, ret:Type.t)
 
-// ¥×¥í¥°¥é¥àÁ´ÂÎ = ÉâÆ°¾®¿ôÄê¿ô¥Æ¡¼¥Ö¥ë + ¥È¥Ã¥×¥ì¥Ù¥ë´Ø¿ô + ¥á¥¤¥ó¤Î¼° (caml2html: sparcasm_prog)
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ å…¨ä½“ = æµ®å‹•å°æ•°å®šæ•°ãƒ†ãƒ¼ãƒ–ãƒ« + ãƒˆãƒƒãƒ—ãƒ¬ãƒ™ãƒ«é–¢æ•° + ãƒ¡ã‚¤ãƒ³ã®å¼ (caml2html: sparcasm_prog)
 case class Prog(a:List[(Id.l, float)],b:List[Fundef],c:T)
 
 def fletd(x, e1, e2) = Let((x, Type.Float), e1, e2)
@@ -119,9 +119,9 @@ def fv(cont,e) = e match {
 	case Let((x, t), exp, e) =>
 		val cont = remove_and_uniq(S.singleton(x), fv(cont, e));
 		fv_exp(cont, exp)
-	case Forget(x, e) => remove_and_uniq (S.singleton x) (fv cont e) // Spill¤µ¤ì¤¿ÊÑ¿ô¤Ï¡¢¼«Í³ÊÑ¿ô¤Î·×»»¤«¤é½ü³° (caml2html: sparcasm_exclude)
+	case Forget(x, e) => remove_and_uniq (S.singleton x) (fv cont e) // Spillã•ã‚ŒãŸå¤‰æ•°ã¯ã€è‡ªç”±å¤‰æ•°ã®è¨ˆç®—ã‹ã‚‰é™¤å¤– (caml2html: sparcasm_exclude)
 	// (if y = z then (forget x; ...) else (forget x; ...)); x + x
-	//   ¤Î¤è¤¦¤Ê¾ì¹ç¤Î¤¿¤á¤Ë¡¢·ÑÂ³¤Î¼«Í³ÊÑ¿ôcont¤ò°ú¿ô¤È¤¹¤ë
+	//   ã®ã‚ˆã†ãªå ´åˆã®ãŸã‚ã«ã€ç¶™ç¶šã®è‡ªç”±å¤‰æ•°contã‚’å¼•æ•°ã¨ã™ã‚‹
 }
 
 def fv(e) = remove_and_uniq(S.empty(fv(List(), e));

@@ -1,13 +1,13 @@
 open KNormal
 
-// ÃÖ´¹¤Î¤¿¤á¤Î´Ø¿ô (caml2html: beta_find)
+// ç½®æ›ã®ãŸã‚ã®é–¢æ•° (caml2html: beta_find)
 def find(x, env) = try {
 	M.find(x, env)
 } catch {
 	case Not_found => x
 }
 
-// ¦Â´ÊÌó¥ë¡¼¥Á¥óËÜÂÎ (caml2html: beta_g)
+// Î²ç°¡ç´„ãƒ«ãƒ¼ãƒãƒ³æœ¬ä½“ (caml2html: beta_g)
 def g(env,e) e match {
 	case Unit => Unit
 	case Int(i) => Int(i)
@@ -22,7 +22,7 @@ def g(env,e) e match {
 	case FDiv(x, y) => FDiv(find(x, env), find(y, env))
 	case IfEq(x, y, e1, e2) => IfEq(find(x, env), find(y, env), g(env, e1), g(env, e2))
 	case IfLE(x, y, e1, e2) => IfLE(find(x, env), find(y, env), g(env, e1), g(env, e2))
-	case Let((x, t), e1, e2) => (* let¤Î¦Â´ÊÌó (caml2html: beta_let) *)
+	case Let((x, t), e1, e2) => (* letã®Î²ç°¡ç´„ (caml2html: beta_let) *)
 		g(env, e1) match {
 		case Var(y) =>
 			println("beta-reducing "+x+" = "+y+"@.");
@@ -33,7 +33,7 @@ def g(env,e) e match {
 		}
 	case LetRec(Fundef(xt,yts,e1), e2) =>
 		LetRec(Fundef(xt,yts,g(env, e1)), g(env, e2))
-	case Var(x) => Var(find(x, env)) // ÊÑ¿ô¤òÃÖ´¹ (caml2html: beta_var)
+	case Var(x) => Var(find(x, env)) // å¤‰æ•°ã‚’ç½®æ› (caml2html: beta_var)
 	case Tuple(xs) => Tuple( xs.map(x => find(x, env)) )
 	case LetTuple(xts, y, e) => LetTuple(xts, find(y, env), g(env, e))
 	case Get(x, y) => Get(find(x, env), find(y, env))

@@ -2,12 +2,12 @@
 
 open KNormal
 
-// ¥Í¥¹¥È¤·¤¿let¤Î´ÊÌó (caml2html: assoc_f)
+// ãƒã‚¹ãƒˆã—ãŸletã®ç°¡ç´„ (caml2html: assoc_f)
 def f(e) = e match {
 	case IfEq(x, y, e1, e2) => IfEq(x, y, f e1, f e2)
 	case IfLE(x, y, e1, e2) => IfLE(x, y, f e1, f e2)
 
-	// let¤Î¾ì¹ç (caml2html: assoc_let)
+	// letã®å ´åˆ (caml2html: assoc_let)
 	case Let(xt, e1, e2) =>
 		val insert = e1 => e1 match {
 			case Let(yt, e3, e4)     => Let(yt, e3, insert(e4))

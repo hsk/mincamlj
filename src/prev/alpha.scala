@@ -8,7 +8,7 @@ def find(x, env) = try {
 	case Not_found => x
 }
 
-// ¦ÁÊÑ´¹¥ë¡¼¥Á¥óËÜÂÎ (caml2html: alpha_g)
+// Î±å¤‰æ›ãƒ«ãƒ¼ãƒãƒ³æœ¬ä½“ (caml2html: alpha_g)
 def g(env, e):T = {
 	case Unit() => Unit()
 	case Int(i) => Int(i)
@@ -23,11 +23,11 @@ def g(env, e):T = {
 	case FDiv(x, y) => FDiv(find(x, env), find(y, env))
 	case IfEq(x, y, e1, e2) => IfEq(find(x, env), find(y, env), g(env, e1), g(env, e2))
 	case IfLE(x, y, e1, e2) => IfLE(find(x, env), find(y, env), g(env, e1), g(env, e2))
-	case Let((x, t), e1, e2) => // let¤Î¦ÁÊÑ´¹ (caml2html: alpha_let)
+	case Let((x, t), e1, e2) => // letã®Î±å¤‰æ› (caml2html: alpha_let)
 		val xdash = Id.genid(x);
 		Let((xdash, t), g(env, e1), g(M.add(x, xdash, env), e2))
 	case Var(x) => Var(find(x, env))
-	case LetRec(Fundef((x, t), yts, e1), e2) => // let rec¤Î¦ÁÊÑ´¹ (caml2html: alpha_letrec)
+	case LetRec(Fundef((x, t), yts, e1), e2) => // let recã®Î±å¤‰æ› (caml2html: alpha_letrec)
 		val env = M.add(x, Id.genid(x), env);
 		val ys = yts.map(fst);
 		val envdash = M.add_list2(ys, ys.map(Id.genid), env);
@@ -43,7 +43,7 @@ def g(env, e):T = {
 		)
 	case App(x, ys) => App(find(x, env), ys.map(y => find(y, env)))
 	case Tuple(xs) => Tuple(xs.map(x => find(x, env)))
-	case LetTuple(xts, y, e) => // LetTuple¤Î¦ÁÊÑ´¹ (caml2html: alpha_lettuple)
+	case LetTuple(xts, y, e) => // LetTupleã®Î±å¤‰æ› (caml2html: alpha_lettuple)
 		val xs = xts.map(fst);
 		val envdash = M.add_list2(xs, xs.map(Id.genid), env);
 		LetTuple(

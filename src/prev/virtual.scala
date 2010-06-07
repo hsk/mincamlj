@@ -2,7 +2,7 @@
 
 open X86Asm
 
-var data = List() // ÉâÆ°¾®¿ô¤ÎÄê¿ô¥Æ¡¼¥Ö¥ë (caml2html: virtual_data)
+var data = List() // æµ®å‹•å°æ•°ã®å®šæ•°ãƒ†ãƒ¼ãƒ–ãƒ« (caml2html: virtual_data)
 
 def classify(xts, ini, addf, addi) = {
 	List.fold_left(
@@ -36,14 +36,14 @@ def expand(xts, ini, addf, addi) = {
 	)
 }
 
-// ¼°¤Î²¾ÁÛ¥Ş¥·¥ó¥³¡¼¥ÉÀ¸À® (caml2html: virtual_g)
+// å¼ã®ä»®æƒ³ãƒã‚·ãƒ³ã‚³ãƒ¼ãƒ‰ç”Ÿæˆ (caml2html: virtual_g)
 def g(env, e) = e match {
 	case Closure.Unit() => Ans(Nop)
 	case Closure.Int(i) => Ans(Set(i))
 	case Closure.Float(d) =>
 		val l =
 			try {
-				// ¤¹¤Ç¤ËÄê¿ô¥Æ¡¼¥Ö¥ë¤Ë¤¢¤Ã¤¿¤éºÆÍøÍÑ
+				// ã™ã§ã«å®šæ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã«ã‚ã£ãŸã‚‰å†åˆ©ç”¨
 				val (l, _) = List.find(
 					(_, ddash) => { d == ddash },
 					data
@@ -88,8 +88,8 @@ def g(env, e) = e match {
 			case Type.Float => Ans(FMovD(x))
 			case _ => Ans(Mov(x))
 		}
-	case Closure.MakeCls((x, t), Closure.Closure(l, ys), e2) => // ¥¯¥í¡¼¥¸¥ã¤ÎÀ¸À® (caml2html: virtual_makecls)
-		// Closure¤Î¥¢¥É¥ì¥¹¤ò¥»¥Ã¥È¤·¤Æ¤«¤é¡¢¼«Í³ÊÑ¿ô¤ÎÃÍ¤ò¥¹¥È¥¢
+	case Closure.MakeCls((x, t), Closure.Closure(l, ys), e2) => // ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£ã®ç”Ÿæˆ (caml2html: virtual_makecls)
+		// Closureã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ã‚»ãƒƒãƒˆã—ã¦ã‹ã‚‰ã€è‡ªç”±å¤‰æ•°ã®å€¤ã‚’ã‚¹ãƒˆã‚¢
 		val e2dash = g(M.add(x, t, env), e2);
 		val (offset, store_fv) =
 		expand (
@@ -128,7 +128,7 @@ def g(env, e) = e match {
 			)
 		);
 		Ans(CallDir(Id.L(x), int, float))
-	case Closure.Tuple(xs) => // ÁÈ¤ÎÀ¸À® (caml2html: virtual_tuple)
+	case Closure.Tuple(xs) => // çµ„ã®ç”Ÿæˆ (caml2html: virtual_tuple)
 		val y = Id.genid("t");
 		val (offset, store) =
 			expand(
@@ -170,7 +170,7 @@ def g(env, e) = e match {
 				}
 			);
 		load
-	case Closure.Get(x, y) => // ÇÛÎó¤ÎÆÉ¤ß½Ğ¤· (caml2html: virtual_get)
+	case Closure.Get(x, y) => // é…åˆ—ã®èª­ã¿å‡ºã— (caml2html: virtual_get)
 		val offset = Id.genid("o");
 		M.find(x, env) match {
 			case Type.Array(Type.Unit) => Ans(Nop)
@@ -198,7 +198,7 @@ def g(env, e) = e match {
 }
 
 
-// ´Ø¿ô¤Î²¾ÁÛ¥Ş¥·¥ó¥³¡¼¥ÉÀ¸À® (caml2html: virtual_h)
+// é–¢æ•°ã®ä»®æƒ³ãƒã‚·ãƒ³ã‚³ãƒ¼ãƒ‰ç”Ÿæˆ (caml2html: virtual_h)
 def h(e) = e match {
 case Closure.Closure((Id.L(x), t); yts; zts; e) =>
 	val (int, float) = separate(yts);
@@ -226,7 +226,7 @@ case Closure.Closure((Id.L(x), t); yts; zts; e) =>
 	}
 }
 
-// ¥×¥í¥°¥é¥àÁ´ÂÎ¤Î²¾ÁÛ¥Ş¥·¥ó¥³¡¼¥ÉÀ¸À® (caml2html: virtual_f)
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ å…¨ä½“ã®ä»®æƒ³ãƒã‚·ãƒ³ã‚³ãƒ¼ãƒ‰ç”Ÿæˆ (caml2html: virtual_f)
 let f (Closure.Prog(fundefs, e)) = {
 	data = List();
 	val fundefs = fundefs.map(h);

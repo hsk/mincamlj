@@ -1,7 +1,7 @@
 open KNormal
 
-// ¥¤¥ó¥é¥¤¥óÅ¸³«¤¹¤ë´Ø¿ô¤ÎºÇÂç¥µ¥¤¥º (caml2html: inline_threshold)
-var threshold = 0 // Main¤Ç-inline¥ª¥×¥·¥ç¥ó¤Ë¤è¤ê¥»¥Ã¥È¤µ¤ì¤ë
+// ã‚¤ãƒ³ãƒ©ã‚¤ãƒ³å±•é–‹ã™ã‚‹é–¢æ•°ã®æœ€å¤§ã‚µã‚¤ã‚º (caml2html: inline_threshold)
+var threshold = 0 // Mainã§-inlineã‚ªãƒ—ã‚·ãƒ§ãƒ³ã«ã‚ˆã‚Šã‚»ãƒƒãƒˆã•ã‚Œã‚‹
 
 def size(e) = e match {
 	case IfEq(_, _, e1, e2)         => 1 + size(e1) + size (e2)
@@ -12,17 +12,17 @@ def size(e) = e match {
 	case _                          => 1
 }
 
-// ¥¤¥ó¥é¥¤¥óÅ¸³«¥ë¡¼¥Á¥óËÜÂÎ (caml2html: inline_g)
+// ã‚¤ãƒ³ãƒ©ã‚¤ãƒ³å±•é–‹ãƒ«ãƒ¼ãƒãƒ³æœ¬ä½“ (caml2html: inline_g)
 def g(env,e) = e match {
 	case IfEq(x, y, e1, e2) => IfEq(x, y, g(env, e1), g(env, e2))
 	case IfLE(x, y, e1, e2) => IfLE(x, y, g(env, e1), g(env, e2))
 	case Let(xt, e1, e2)    => Let(xt, g(env, e1), g(env, e2))
 
-	// ´Ø¿ôÄêµÁ¤Î¾ì¹ç (caml2html: inline_letrec)
+	// é–¢æ•°å®šç¾©ã®å ´åˆ (caml2html: inline_letrec)
 	case LetRec(Fundef((x, t), yts, e1), e2) => 
 		val env = if (size(e1) > threshold) env else M.add(x,(yts, e1), env);
 		LetRec(Fundef((x, t), yts, g(env, e1)), g(env, e2))
-	// ´Ø¿ôÅ¬ÍÑ¤Î¾ì¹ç (caml2html: inline_app)
+	// é–¢æ•°é©ç”¨ã®å ´åˆ (caml2html: inline_app)
 	case App(x, ys) if(M.mem(x, env) => 
 		val (zs, e) = M.find(x, env);
 		println( "inlining "+x+"@.");

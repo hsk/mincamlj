@@ -1,6 +1,6 @@
 open KNormal
 
-// ÉûºîÍÑ¤ÎÍ­Ìµ (caml2html: elim_effect)
+// å‰¯ä½œç”¨ã®æœ‰ç„¡ (caml2html: elim_effect)
 def effect(e) = e match {
 	case Let(_, e1, e2)     => effect(e1) || effect(e2)
 	case IfEq(_, _, e1, e2) => effect(e1) || effect(e2)
@@ -11,11 +11,11 @@ def effect(e) = e match {
 	case _ => false
 }
 
-// ÉÔÍ×ÄêµÁºï½ü¥ë¡¼¥Á¥óËÜÂÎ (caml2html: elim_f)
+// ä¸è¦å®šç¾©å‰Šé™¤ãƒ«ãƒ¼ãƒãƒ³æœ¬ä½“ (caml2html: elim_f)
 def f(e) = e match {
 	case IfEq(x, y, e1, e2) => IfEq(x, y, f(e1), f(e2))
 	case IfLE(x, y, e1, e2) => IfLE(x, y, f(e1), f(e2))
-	case Let((x, t), e1, e2) => // let¤Î¾ì¹ç (caml2html: elim_let)
+	case Let((x, t), e1, e2) => // letã®å ´åˆ (caml2html: elim_let)
 		val e1dash = f(e1);
 		val e2dash = f(e2);
 		if (effect(e1dash) || S.mem(x, fv(e2dash)) ) {
@@ -24,7 +24,7 @@ def f(e) = e match {
 			println("eliminating variable "+x+"@.") ;
 			e2dash
 		}
-	case LetRec(Fundef((x, t),yts,e1), e2) => // let rec¤Î¾ì¹ç (caml2html: elim_letrec)
+	case LetRec(Fundef((x, t),yts,e1), e2) => // let recã®å ´åˆ (caml2html: elim_letrec)
 		val e2dash = f(e2);
 		if (S.mem(x,fv(e2dash))) {
 			LetRec(Fundef((x, t), yts, f(e1)), e2dash)

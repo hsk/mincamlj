@@ -1,6 +1,6 @@
 open X86Asm
 
-// Ì¿ÎáÎó¤Î13bitÂ¨ÃÍºÇÅ¬²½ (caml2html: simm13_g)
+// å‘½ä»¤åˆ—ã®13bitå³å€¤æœ€é©åŒ– (caml2html: simm13_g)
 def g(env, e) = e match {
 	case Ans(exp) => Ans(gdash(env, exp))
 	case Let((x, t), Set(i), e) if ((-4096 <= i) && (i < 4096)) =>
@@ -19,7 +19,7 @@ def g(env, e) = e match {
 case Forget(x, e) => Forget(x, g(env, e))
 }
 
-// ³ÆÌ¿Îá¤Î13bitÂ¨ÃÍºÇÅ¬²½ (caml2html: simm13_gprime)
+// å„å‘½ä»¤ã®13bitå³å€¤æœ€é©åŒ– (caml2html: simm13_gprime)
 def gdash(env, e) = e match {
 	case Add(x, V(y)) if (M.mem(y, env)) => Add(x, C(M.find(y, env)))
 	case Add(x, V(y)) if (M.mem(x, env)) => Add(y, C(M.find(x, env)))
@@ -43,9 +43,9 @@ def gdash(env, e) = e match {
 	case e => e
 }
 
-// ¥È¥Ã¥×¥ì¥Ù¥ë´Ø¿ô¤Î13bitÂ¨ÃÍºÇÅ¬²½
+// ãƒˆãƒƒãƒ—ãƒ¬ãƒ™ãƒ«é–¢æ•°ã®13bitå³å€¤æœ€é©åŒ–
 def h(Fundef(l, xs, ys, e, t)) = Fundef(l, xs, ys, g(M.empty(), e), t)
 
-// ¥×¥í¥°¥é¥àÁ´ÂÎ¤Î13bitÂ¨ÃÍºÇÅ¬²½
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ å…¨ä½“ã®13bitå³å€¤æœ€é©åŒ–
 def f (Prog(data, fundefs, e)) = 
   Prog(data, fundefs.map(h) , g(M.empty(), e))
