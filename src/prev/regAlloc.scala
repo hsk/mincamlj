@@ -17,7 +17,7 @@ def alloc(cont, regenv, x, t) = {
 	} else {
 		val free = fv(cont);
 		try {
-			val live = // À¸¤­¤Æ¤¤¤ë¥ì¥¸¥¹¥¿
+			val live = // ç”Ÿãã¦ã„ã‚‹ãƒ¬ã‚¸ã‚¹ã‚¿
 				List.fold_left(
 					(live,y) => {
 						if (is_reg(y)) {
@@ -33,7 +33,7 @@ def alloc(cont, regenv, x, t) = {
 					S.empty,
 					free
 				);
-			val r = // ¤½¤¦¤Ç¤Ê¤¤¥ì¥¸¥¹¥¿¤òÃµ¤¹
+			val r = // ãã†ã§ãªã„ãƒ¬ã‚¸ã‚¹ã‚¿ã‚’æ¢ã™
 				List.find(
 					r => not(S.mem(r, live)),
 					all
@@ -76,7 +76,7 @@ case V(x) => V(find x Type.Int regenv)
 case c => c
 }
 
-// Ì¿ÎáÎó¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_g)
+// å‘½ä»¤åˆ—ã®ãƒ¬ã‚¸ã‚¹ã‚¿å‰²ã‚Šå½“ã¦ (caml2html: regalloc_g)
 def g(dest, cont, regenv, e) = e match {
 	case Ans(exp) => gdash_and_restore dest cont regenv exp
 	case Let((x, t) as xt, exp, e) =>
@@ -89,7 +89,7 @@ def g(dest, cont, regenv, e) = e match {
 	case Forget(x, e) => assert false
 }
 
-// »ÈÍÑ¤µ¤ì¤ëÊÑ¿ô¤ò¥¹¥¿¥Ã¥¯¤«¤é¥ì¥¸¥¹¥¿¤ØRestore (caml2html: regalloc_unspill)
+// ä½¿ç”¨ã•ã‚Œã‚‹å¤‰æ•°ã‚’ã‚¹ã‚¿ãƒƒã‚¯ã‹ã‚‰ãƒ¬ã‚¸ã‚¹ã‚¿ã¸Restore (caml2html: regalloc_unspill)
 def gdash_and_restore(dest, cont, regenv, exp) = {
 	try {
 		gdash(dest, cont, regenv, exp)
@@ -100,7 +100,7 @@ def gdash_and_restore(dest, cont, regenv, exp) = {
 	}
 }
 
-// ³ÆÌ¿Îá¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_gprime)
+// å„å‘½ä»¤ã®ãƒ¬ã‚¸ã‚¹ã‚¿å‰²ã‚Šå½“ã¦ (caml2html: regalloc_gprime)
 def gdash(dest, cont, regenv, e) = e match {
 	case Nop() | Set(_) | SetL(_) | Comment(_) | exp@Restore(_) => (Ans(exp), regenv)
 	case Mov(x) => (Ans(Mov(find(x, Type.Int(), regenv))), regenv)
@@ -127,12 +127,12 @@ def gdash(dest, cont, regenv, e) = e match {
 	case exp@CallDir(l, ys, zs)   => gdash_call(dest, cont, regenv, exp, (ys, zs) => CallDir(l, ys, zs), ys, zs)
 	case Save(x, y) => assert(false)
 }
-// if¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_if)
+// ifã®ãƒ¬ã‚¸ã‚¹ã‚¿å‰²ã‚Šå½“ã¦ (caml2html: regalloc_if)
 def gdash_if(dest, cont, regenv, exp, constr, e1, e2) = {
 	val (e1dash, regenv1) = g(dest, cont, regenv, e1);
 	val (e2dash, regenv2) = g(dest, cont, regenv, e2);
 	
-	// Î¾Êı¤Ë¶¦ÄÌ¤Î¥ì¥¸¥¹¥¿ÊÑ¿ô¤À¤±ÍøÍÑ
+	// ä¸¡æ–¹ã«å…±é€šã®ãƒ¬ã‚¸ã‚¹ã‚¿å¤‰æ•°ã ã‘åˆ©ç”¨
 	val regenvdash = List.fold_left(
 		(regenvdash, x) => {
 			try {
@@ -162,13 +162,13 @@ def gdash_if(dest, cont, regenv, exp, constr, e1, e2) = {
 			} else {
 				 seq(Save(M.find x regenv, x), e)
 			}
-		}, // ¤½¤¦¤Ç¤Ê¤¤ÊÑ¿ô¤ÏÊ¬´ôÄ¾Á°¤Ë¥»¡¼¥Ö
+		}, // ãã†ã§ãªã„å¤‰æ•°ã¯åˆ†å²ç›´å‰ã«ã‚»ãƒ¼ãƒ–
 		Ans(constr(e1dash, e2dash)),
 		fv(cont),
 		regenvdash
 	 )
 }
-// ´Ø¿ô¸Æ¤Ó½Ğ¤·¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_call)
+// é–¢æ•°å‘¼ã³å‡ºã—ã®ãƒ¬ã‚¸ã‚¹ã‚¿å‰²ã‚Šå½“ã¦ (caml2html: regalloc_call)
 def gdash_call(dest, cont, regenv, exp, constr, ys, zs) = {
 	List.fold_left(
 		(e, x) => {
@@ -187,7 +187,7 @@ def gdash_call(dest, cont, regenv, exp, constr, ys, zs) = {
 	)
 }
 
-// ´Ø¿ô¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_h)
+// é–¢æ•°ã®ãƒ¬ã‚¸ã‚¹ã‚¿å‰²ã‚Šå½“ã¦ (caml2html: regalloc_h)
 def h { name = Id.L(x); args = ys; fargs = zs; body = e; ret = t } = {
 	val regenv = M.add(x, reg_cl, M.empty);
 	val (i, arg_regs, regenv) = List.fold_left(
@@ -216,7 +216,7 @@ def h { name = Id.L(x); args = ys; fargs = zs; body = e; ret = t } = {
 	{ name = Id.L(x); args = arg_regs; fargs = farg_regs; body = edash; ret = t }
 }
 
-// ¥×¥í¥°¥é¥àÁ´ÂÎ¤Î¥ì¥¸¥¹¥¿³ä¤êÅö¤Æ (caml2html: regalloc_f)
+// ãƒ—ãƒ­ã‚°ãƒ©ãƒ å…¨ä½“ã®ãƒ¬ã‚¸ã‚¹ã‚¿å‰²ã‚Šå½“ã¦ (caml2html: regalloc_f)
 def f (Prog(data, fundefs, e)) = {
 	println("register allocation: may take some time (up to a few minutes, depending on the size of functions)@.");
 	val fundefsdash = fundefs.map(h);
