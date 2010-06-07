@@ -9,10 +9,10 @@ def alloc(cont, regenv, x, t) = {
 		case _          => allregs
 	}
 
-	if all == List("%g0") {
+	if (all == List("%g0")) {
 		"%g0"
 	} else // [XX] ad hoc optimization
-	if (is_reg(x)){
+	if (is_reg(x)) {
 		x
 	} else {
 		val free = fv(cont);
@@ -71,22 +71,22 @@ def find(x, t, regenv) = {
 	}
 }
 
-def finddash xdash regenv = xdash match {
-case V(x) => V(find x Type.Int regenv)
-case c => c
+def finddash(xdash, regenv) = xdash match {
+	case V(x) => V(find(x, Type.Int(), regenv))
+	case c => c
 }
 
 // 命令列のレジスタ割り当て (caml2html: regalloc_g)
 def g(dest, cont, regenv, e) = e match {
 	case Ans(exp) => gdash_and_restore dest cont regenv exp
-	case Let((x, t) as xt, exp, e) =>
-		assert (not (M.mem x regenv));
-		let contdash = concat e dest cont in
-		let (e1dash, regenv1) = gdash_and_restore xt contdash regenv exp in
-		let r = alloc contdash regenv1 x t in
-		let (e2dash, regenv2) = g dest cont (add x r regenv1) e in
-		(concat e1dash (r, t) e2dash, regenv2)
-	case Forget(x, e) => assert false
+	case Let(xt@(x, t), exp, e) =>
+		assert (not(M.mem(x, regenv)));
+		val contdash = concat(e, dest, cont);
+		val (e1dash, regenv1) = gdash_and_restore(xt, contdash, regenv, exp);
+		val r = alloc(contdash, regenv1, x, t);
+		val (e2dash, regenv2) = g(dest, cont, add(x, r, regenv1), e);
+		concat(e1dash, (r, t), (e2dash, regenv2))
+	case Forget(x, e) => assert(false)
 }
 
 // 使用される変数をスタックからレジスタへRestore (caml2html: regalloc_unspill)
@@ -94,24 +94,24 @@ def gdash_and_restore(dest, cont, regenv, exp) = {
 	try {
 		gdash(dest, cont, regenv, exp)
 	} catch {
-		NoReg(x, t) =>
-			// println("restoring " + x + "@.")
-			g(dest, cont, regenv, Let((x, t), Restore(x), Ans(exp))))
+	NoReg(x, t) =>
+		// println("restoring " + x + "@.")
+		g(dest, cont, regenv, Let((x, t), Restore(x), Ans(exp))))
 	}
 }
 
 // 各命令のレジスタ割り当て (caml2html: regalloc_gprime)
 def gdash(dest, cont, regenv, e) = e match {
-	case Nop() | Set(_) | SetL(_) | Comment(_) | exp@Restore(_) => (Ans(exp), regenv)
+	case Nop() | Set(_) | SetL(_) | Comment(_) | Restore(_) => (Ans(e), regenv)
 	case Mov(x) => (Ans(Mov(find(x, Type.Int(), regenv))), regenv)
 	case Neg(x) => (Ans(Neg(find(x, Type.Int(), regenv))), regenv)
 	case Add(x, ydash) => (Ans(Add(find(x, Type.Int(), regenv), finddash(ydash, regenv))), regenv)
 	case Sub(x, ydash) => (Ans(Sub(find(x, Type.Int(), regenv), finddash(ydash, regenv))), regenv)
 	case SLL(x, ydash) => (Ans(SLL(find(x, Type.Int(), regenv), finddash(ydash, regenv))), regenv)
 	case Ld (x, ydash) => (Ans(Ld (find(x, Type.Int(), regenv), finddash(ydash, regenv))), regenv)
-	case St(x, y, zdash) => (Ans(St(find(x, Type.Int() regenv), find(y, Type.Int(), regenv), finddash(zdash, regenv))), regenv)
-	case FMovD(x) => (Ans(FMovD(find(x, Type.Float() regenv))), regenv)
-	case FNegD(x) => (Ans(FNegD(find(x, Type.Float() regenv))), regenv)
+	case St(x, y, zdash) => (Ans(St(find(x, Type.Int(), regenv), find(y, Type.Int(), regenv), finddash(zdash, regenv))), regenv)
+	case FMovD(x) => (Ans(FMovD(find(x, Type.Float(), regenv))), regenv)
+	case FNegD(x) => (Ans(FNegD(find(x, Type.Float(), regenv))), regenv)
 	case FAddD(x, y) => (Ans(FAddD(find(x, Type.Float(), regenv), find(y, Type.Float(), regenv))), regenv)
 	case FSubD(x, y) => (Ans(FSubD(find(x, Type.Float(), regenv), find(y, Type.Float(), regenv))), regenv)
 	case FMulD(x, y) => (Ans(FMulD(find(x, Type.Float(), regenv), find(y, Type.Float(), regenv))), regenv)
@@ -160,7 +160,7 @@ def gdash_if(dest, cont, regenv, exp, constr, e1, e2) = {
 			if (x == fst(dest) || not(M.mem(x, regenv)) || M.mem(x, regenvdash)) {
 				e
 			} else {
-				 seq(Save(M.find x regenv, x), e)
+				 seq(Save(M.find(x, regenv), x), e)
 			}
 		}, // そうでない変数は分岐直前にセーブ
 		Ans(constr(e1dash, e2dash)),
