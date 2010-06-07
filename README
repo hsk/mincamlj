@@ -1,1 +1,7 @@
 Mincamlj
+
+commit
+
+git commit -a
+git push origin master
+
