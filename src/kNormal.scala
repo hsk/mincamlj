@@ -1,36 +1,37 @@
-package knormal;
+package mincaml;
 /* give names to intermediate values (K-normalization) */
 
-/* KÀµµ¬²½¸å¤Î¼° (caml2html: knormal_t) */
-sealed abstract class T();
-case class Unit() extends T;
-case class Int(a:Int) extends T;
-case class Float(a:Float) extends T;
-case class Neg(a:Id.T) extends T;
-case class Add(a:Id.T, b:Id.T) extends Bin;
-case class Sub(a:Id.T, b:Id.T) extends Bin;
-case class FNeg(a:Id.T) extends T;
-case class FAdd(a:Id.T, b:Id.T) extends Bin;
-case class FSub(a:Id.T, b:Id.T) extends Bin;
-case class FMul(a:Id.T, b:Id.T) extends Bin;
-case class FDiv(a:Id.T, b:Id.T) extends Bin;
-case class IfEq(a:Id.T, b:Id.T, c:T, d:T) extends T; // Èæ³Ó + Ê¬´ô (caml2html: knormal_branch)
-case class IfLE(a:Id.T, b:Id.T, c:T, d:T) extends T;// Èæ³Ó + Ê¬´ô 
-case class Let(a:(Id.T, Type.T), b:T, c:T) extends T;
-case class Var(a:Id.T) extends T;
-case class LetRec(a:Fundef, b:t) extends T;
-case class App(a:Id.T, b:List[Id.T]) extends T;
-case class Tuple(a:List[Id.T]) extends T;
-case class LetTuple(a:List[(Id.T,Type.T)], b:Id.T, c:T) extends T;
-case class Get(a:Id.T, b:Id.T) extends Bin;
-case class Put(a:Id.T, b:Id.T, c:Id.T) extends T;
-case class ExtArray(a:Id.T) extends T;
-case class ExtFunApp(a:Id.T, b:List[Id.T]) extends T;
-case class Fundef(name:(Id.T, Type.T), args:List[(Id.T, Type.T)], body:t);
+/* Kæ­£è¦åŒ–å¾Œã®å¼ (caml2html: knormal_t) */
 
 object kNormal {
 
-	/* ¼°¤Ë½Ð¸½¤¹¤ë¡Ê¼«Í³¤Ê¡ËÊÑ¿ô (caml2html: knormal_fv) */
+	sealed abstract class T();
+	case class Unit() extends T;
+	case class Int(a:Int) extends T;
+	case class Float(a:Float) extends T;
+	case class Neg(a:Id.T) extends T;
+	case class Add(a:Id.T, b:Id.T) extends Bin;
+	case class Sub(a:Id.T, b:Id.T) extends Bin;
+	case class FNeg(a:Id.T) extends T;
+	case class FAdd(a:Id.T, b:Id.T) extends Bin;
+	case class FSub(a:Id.T, b:Id.T) extends Bin;
+	case class FMul(a:Id.T, b:Id.T) extends Bin;
+	case class FDiv(a:Id.T, b:Id.T) extends Bin;
+	case class IfEq(a:Id.T, b:Id.T, c:T, d:T) extends T; // æ¯”è¼ƒ + åˆ†å² (caml2html: knormal_branch)
+	case class IfLE(a:Id.T, b:Id.T, c:T, d:T) extends T;// æ¯”è¼ƒ + åˆ†å² 
+	case class Let(a:(Id.T, Type.T), b:T, c:T) extends T;
+	case class Var(a:Id.T) extends T;
+	case class LetRec(a:Fundef, b:t) extends T;
+	case class App(a:Id.T, b:List[Id.T]) extends T;
+	case class Tuple(a:List[Id.T]) extends T;
+	case class LetTuple(a:List[(Id.T,Type.T)], b:Id.T, c:T) extends T;
+	case class Get(a:Id.T, b:Id.T) extends Bin;
+	case class Put(a:Id.T, b:Id.T, c:Id.T) extends T;
+	case class ExtArray(a:Id.T) extends T;
+	case class ExtFunApp(a:Id.T, b:List[Id.T]) extends T;
+	case class Fundef(name:(Id.T, Type.T), args:List[(Id.T, Type.T)], body:t);
+
+	/* å¼ã«å‡ºç¾ã™ã‚‹ï¼ˆè‡ªç”±ãªï¼‰å¤‰æ•° (caml2html: knormal_fv) */
 /*
 	def fv(e:T):S.t = e match {
 		case Unit() | Int(_) | Float(_) | ExtArray(_) => S.empty()
@@ -58,25 +59,25 @@ object kNormal {
 	}
 */
 
-	/* let¤òÁÞÆþ¤¹¤ëÊä½õ´Ø¿ô (caml2html: knormal_insert) */
-	def insert_let((e:T, t:Type.T), k:(Id.T)=>(T, T)):(T, T) = e match {
-		case Var(x) => k(x)
-		case _ =>
+	/* letã‚’æŒ¿å…¥ã™ã‚‹è£œåŠ©é–¢æ•° (caml2html: knormal_insert) */
+	def insert_let(e1:(T, Type.T), k:(Id.T)=>(T, T)):(T, T) = e1 match {
+		case (e,Var(x)) => k(x)
+		case (e,t) =>
 			val x = Id.Id.gentmp(t)
 			val (edash, tdash) = k(x)
 			(Let((x, t), e, edash), tdash)
 	}
 
-	/* KÀµµ¬²½¥ë¡¼¥Á¥óËÜÂÎ (caml2html: knormal_g) */
+	/* Kæ­£è¦åŒ–ãƒ«ãƒ¼ãƒãƒ³æœ¬ä½“ (caml2html: knormal_g) */
 	def g(env:HashMap[Any,Option[Type.T]])(e):(T,Type.T) = e match {
 		case syntax.Unit() => (Unit, Type.Unit)
-		case syntax.Bool(b) => (Int(if(b) 1 else 0), Type.Int) // ÏÀÍýÃÍtrue, false¤òÀ°¿ô1, 0¤ËÊÑ´¹ (caml2html: knormal_bool)
+		case syntax.Bool(b) => (Int(if(b) 1 else 0), Type.Int) // è«–ç†å€¤true, falseã‚’æ•´æ•°1, 0ã«å¤‰æ› (caml2html: knormal_bool)
 		case syntax.Int(i) => (Int(i), Type.Int)
 		case syntax.Float(d) => (Float(d), Type.Float)
 		case syntax.Not(e) => g(env, syntax.If(e, syntax.Bool(false), syntax.Bool(true)))
 		case syntax.Neg(e) => insert_let(g(env, e), x => (Neg(x), Type.Int))
 
-		// Â­¤·»»¤ÎKÀµµ¬²½ (caml2html: knormal_add)
+		// è¶³ã—ç®—ã®Kæ­£è¦åŒ– (caml2html: knormal_add)
 		case syntax.Add(e1, e2) =>
 			insert_let(
 				g(env, e1),
@@ -132,7 +133,7 @@ object kNormal {
 			)
 		case cmp@(syntax.Eq(_) | yntax.LE(_))=>
 			g(env, syntax.If(cmp, syntax.Bool(true), syntax.Bool(false)))
-		case syntax.If(syntax.Not(e1), e2, e3) => g(env, syntax.If(e1, e3, e2)) // not¤Ë¤è¤ëÊ¬´ô¤òÊÑ´¹ (caml2html: knormal_not)
+		case syntax.If(syntax.Not(e1), e2, e3) => g(env, syntax.If(e1, e3, e2)) // notã«ã‚ˆã‚‹åˆ†å²ã‚’å¤‰æ› (caml2html: knormal_not)
 		case syntax.If(syntax.Eq(e1, e2), e3, e4) =>
 			insert_let(
 				g(env, e1),
@@ -141,7 +142,7 @@ object kNormal {
 					y => {
 						val (e3dash, t3) = g(env, e3);
 						val (e4dash, t4) = g(env, e4);
-						(IfEq(x, y, e3', e4'), t3);
+						(IfEq(x, y, e3, e4), t3);
 					}
 				)
 			)
@@ -158,13 +159,13 @@ object kNormal {
 				)
 			)
 		case syntax.If(e1, e2, e3) =>
-			g(env, syntax.If(syntax.Eq(e1, syntax.Bool(false)), e3, e2) // Èæ³Ó¤Î¤Ê¤¤Ê¬´ô¤òÊÑ´¹ (caml2html: knormal_if)
+			g(env, syntax.If(syntax.Eq(e1, syntax.Bool(false)), e3, e2) // æ¯”è¼ƒã®ãªã„åˆ†å²ã‚’å¤‰æ› (caml2html: knormal_if)
 		case syntax.Let((x, t), e1, e2) =>
 			val (e1dash, t1) = g(env, e1);
 			val (e2dash, t2) = g(M.add(x, t, env), e2);
 			(Let((x, t), e1dash, e2dash), t2)
 		case syntax.Var(x) if(M.mem(x, env)) => (Var(x), M.find(x,env))
-		case syntax.Var(x) => // ³°ÉôÇÛÎó¤Î»²¾È (caml2html: knormal_extarray)
+		case syntax.Var(x) => // å¤–éƒ¨é…åˆ—ã®å‚ç…§ (caml2html: knormal_extarray)
 			M.find(x, !Typing.extenv) match {
 				case t@Type.Array(_) => (ExtArray(x), t)
 				case _ => throw new Exception("external variable "+ x +" does not have an array type")
@@ -174,7 +175,7 @@ object kNormal {
 			val (e2dash, t2) = g(envdash, e2)
 			val (e1dash, t1) = g (M.add_list(yts, envdash), e1)
 			(LetRec(Fundef((x, t), yts, e1dash), e2dash), t2)
-		case syntax.App(syntax.Var(f), e2s) when not (M.mem f env) => // ³°Éô´Ø¿ô¤Î¸Æ¤Ó½Ð¤· (caml2html: knormal_extfunapp)
+		case syntax.App(syntax.Var(f), e2s) when not (M.mem f env) => // å¤–éƒ¨é–¢æ•°ã®å‘¼ã³å‡ºã— (caml2html: knormal_extfunapp)
 			M.find(f, !Typing.extenv) match {
 				case Type.Fun(_, t) =>
 					val bind (xs,e) => e match {// "xs" are identifiers for the arguments 
