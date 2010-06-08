@@ -6,27 +6,27 @@ sealed abstract class T();
 case class Unit() extends T;
 case class Int(a:Int) extends T;
 case class Float(a:Float) extends T;
-case class Neg(a:id.T) extends T;
-case class Add(a:id.T, b:id.T) extends Bin;
-case class Sub(a:id.T, b:id.T) extends Bin;
-case class FNeg(a:id.T) extends T;
-case class FAdd(a:id.T, b:id.T) extends Bin;
-case class FSub(a:id.T, b:id.T) extends Bin;
-case class FMul(a:id.T, b:id.T) extends Bin;
-case class FDiv(a:id.T, b:id.T) extends Bin;
-case class IfEq(a:id.T, b:id.T, c:T, d:T) extends T; // 比較 + 分岐 (caml2html: knormal_branch)
-case class IfLE(a:id.T, b:id.T, c:T, d:T) extends T;// 比較 + 分岐 
-case class Let(a:(id.T, typ.T), b:T, c:T) extends T;
-case class Var(a:id.T) extends T;
+case class Neg(a:Id.T) extends T;
+case class Add(a:Id.T, b:Id.T) extends Bin;
+case class Sub(a:Id.T, b:Id.T) extends Bin;
+case class FNeg(a:Id.T) extends T;
+case class FAdd(a:Id.T, b:Id.T) extends Bin;
+case class FSub(a:Id.T, b:Id.T) extends Bin;
+case class FMul(a:Id.T, b:Id.T) extends Bin;
+case class FDiv(a:Id.T, b:Id.T) extends Bin;
+case class IfEq(a:Id.T, b:Id.T, c:T, d:T) extends T; // 比較 + 分岐 (caml2html: knormal_branch)
+case class IfLE(a:Id.T, b:Id.T, c:T, d:T) extends T;// 比較 + 分岐 
+case class Let(a:(Id.T, Type.T), b:T, c:T) extends T;
+case class Var(a:Id.T) extends T;
 case class LetRec(a:Fundef, b:t) extends T;
-case class App(a:id.T, b:List[id.T]) extends T;
-case class Tuple(a:List[id.T]) extends T;
-case class LetTuple(a:List[(id.T,typ.T)], b:id.T, c:T) extends T;
-case class Get(a:id.T, b:id.T) extends Bin;
-case class Put(a:id.T, b:id.T, c:id.T) extends T;
-case class ExtArray(a:id.T) extends T;
-case class ExtFunApp(a:id.T, b:List[id.T]) extends T;
-case class Fundef(name:(id.T, typ.T), args:List[(id.T, typ.T)], body:t);
+case class App(a:Id.T, b:List[Id.T]) extends T;
+case class Tuple(a:List[Id.T]) extends T;
+case class LetTuple(a:List[(Id.T,Type.T)], b:Id.T, c:T) extends T;
+case class Get(a:Id.T, b:Id.T) extends Bin;
+case class Put(a:Id.T, b:Id.T, c:Id.T) extends T;
+case class ExtArray(a:Id.T) extends T;
+case class ExtFunApp(a:Id.T, b:List[Id.T]) extends T;
+case class Fundef(name:(Id.T, Type.T), args:List[(Id.T, Type.T)], body:t);
 
 object kNormal {
 
@@ -59,22 +59,22 @@ object kNormal {
 */
 
 	/* letを挿入する補助関数 (caml2html: knormal_insert) */
-	def insert_let((e:T, t:typ.T), k:(id.T)=>(T, T)):(T, T) = e match {
+	def insert_let((e:T, t:Type.T), k:(Id.T)=>(T, T)):(T, T) = e match {
 		case Var(x) => k(x)
 		case _ =>
-			val x = id.Id.gentmp(t)
+			val x = Id.Id.gentmp(t)
 			val (edash, tdash) = k(x)
 			(Let((x, t), e, edash), tdash)
 	}
 
 	/* K正規化ルーチン本体 (caml2html: knormal_g) */
-	def g(env:HashMap[Any,Option[typ.T]])(e):(T,typ.T) = e match {
-		case syntax.Unit() => (Unit, typ.Unit)
-		case syntax.Bool(b) => (Int(if(b) 1 else 0), typ.Int) // 論理値true, falseを整数1, 0に変換 (caml2html: knormal_bool)
-		case syntax.Int(i) => (Int(i), typ.Int)
-		case syntax.Float(d) => (Float(d), typ.Float)
+	def g(env:HashMap[Any,Option[Type.T]])(e):(T,Type.T) = e match {
+		case syntax.Unit() => (Unit, Type.Unit)
+		case syntax.Bool(b) => (Int(if(b) 1 else 0), Type.Int) // 論理値true, falseを整数1, 0に変換 (caml2html: knormal_bool)
+		case syntax.Int(i) => (Int(i), Type.Int)
+		case syntax.Float(d) => (Float(d), Type.Float)
 		case syntax.Not(e) => g(env, syntax.If(e, syntax.Bool(false), syntax.Bool(true)))
-		case syntax.Neg(e) => insert_let(g(env, e), x => (Neg(x), typ.Int))
+		case syntax.Neg(e) => insert_let(g(env, e), x => (Neg(x), Type.Int))
 
 		// 足し算のK正規化 (caml2html: knormal_add)
 		case syntax.Add(e1, e2) =>
@@ -82,7 +82,7 @@ object kNormal {
 				g(env, e1),
 				x => insert_let(
 					g(env, e2),
-					y => (Add(x, y), typ.Int)
+					y => (Add(x, y), Type.Int)
 				)
 			)
 		case syntax.Sub(e1, e2) =>
@@ -90,20 +90,20 @@ object kNormal {
 				g(env, e1),
 				x => insert_let(
 					g(env, e2),
-					y => (Sub(x, y), typ.Int)
+					y => (Sub(x, y), Type.Int)
 				)
 			)
 		case syntax.FNeg(e) =>
 			insert_let(
 				g(env, e),
-				x => (FNeg(x), typ.Float)
+				x => (FNeg(x), Type.Float)
 			)
 		case syntax.FAdd(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
 					g(env, e2),
-					y => (FAdd(x, y), typ.Float)
+					y => (FAdd(x, y), Type.Float)
 				)
 			)
 		case syntax.FSub(e1, e2) =>
@@ -111,7 +111,7 @@ object kNormal {
 				g(env, e1),
 				x => insert_let(
 					g(env, e2),
-					y => (FSub(x, y), typ.Float)
+					y => (FSub(x, y), Type.Float)
 				)
 			)
 		case syntax.FMul(e1, e2) =>
@@ -119,7 +119,7 @@ object kNormal {
 				g(env, e1),
 				x => insert_let(
 					g(env, e2),
-					y => (FMul(x, y), typ.Float)
+					y => (FMul(x, y), Type.Float)
 				)
 			)
 		case syntax.FDiv(e1, e2) =>
@@ -127,7 +127,7 @@ object kNormal {
 				g(env, e1),
 				x => insert_let(
 					g(env, e2),
-					y => (FDiv(x, y), typ.Float)
+					y => (FDiv(x, y), Type.Float)
 				)
 			)
 		case cmp@(syntax.Eq(_) | yntax.LE(_))=>
@@ -166,7 +166,7 @@ object kNormal {
 		case syntax.Var(x) if(M.mem(x, env)) => (Var(x), M.find(x,env))
 		case syntax.Var(x) => // 外部配列の参照 (caml2html: knormal_extarray)
 			M.find(x, !Typing.extenv) match {
-				case t@typ.Array(_) => (ExtArray(x), t)
+				case t@Type.Array(_) => (ExtArray(x), t)
 				case _ => throw new Exception("external variable "+ x +" does not have an array type")
 			}
 		case syntax.LetRec(syntax.Fundef((x, t),yts,e1), e2) =>
@@ -176,7 +176,7 @@ object kNormal {
 			(LetRec(Fundef((x, t), yts, e1dash), e2dash), t2)
 		case syntax.App(syntax.Var(f), e2s) when not (M.mem f env) => // 外部関数の呼び出し (caml2html: knormal_extfunapp)
 			M.find(f, !Typing.extenv) match {
-				case typ.Fun(_, t) =>
+				case Type.Fun(_, t) =>
 					val bind (xs,e) => e match {// "xs" are identifiers for the arguments 
 						case List() => (ExtFunApp(f, xs), t)
 						case e2 :: e2s =>
@@ -190,7 +190,7 @@ object kNormal {
 			}
 		case syntax.App(e1, e2s) =>
 			g(env, e1) match {
-				case g_e1@(_, typ.Fun(_, t)) =>
+				case g_e1@(_, Type.Fun(_, t)) =>
 					insert_let(
 						g_e1,
 						f => {
@@ -209,7 +209,7 @@ object kNormal {
 			}
 		case syntax.Tuple(es) =>
 			val bind = (xs, ts, es) => es match { // "xs" and "ts" are identifiers and types for the elements
-			case List() => (Tuple(xs), typ.Tuple(ts))
+			case List() => (Tuple(xs), Type.Tuple(ts))
 			case e :: es =>
 			    val g_e@(_, t) = g(env, e);
 			    insert_let(
@@ -235,17 +235,17 @@ object kNormal {
 						g_e2,
 						y => {
 							val l = t2 match {
-							case typ.Float => "create_float_array"
+							case Type.Float => "create_float_array"
 							case _         => "create_array"
 							}
-							(ExtFunApp(l, List(x, y)), typ.Array(t2))
+							(ExtFunApp(l, List(x, y)), Type.Array(t2))
 						}
 					)
 				}
 			)
 		case syntax.Get(e1, e2) =>
 			g(env, e1) match {
-				case g_e1@(_, typ.Array(t)) =>
+				case g_e1@(_, Type.Array(t)) =>
 					insert_let(
 						g_e1,
 						x => insert_let(
@@ -262,14 +262,14 @@ object kNormal {
 					g(env, e2),
 					y => insert_let(
 						g(env, e3),
-						z => (Put(x, y, z), typ.Unit())
+						z => (Put(x, y, z), Type.Unit())
 					)
 				)
 			)
 	}
 
 	def f(e:syntax.T):T = {
-		val (a,b) = g(new HashMap[Any,Option[typ.T]], e)
+		val (a,b) = g(new HashMap[Any,Option[Type.T]], e)
 		a
 	}
 }

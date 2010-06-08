@@ -1,6 +1,5 @@
 %{
   import java.io.*;
-  import syntax.*;
 %}
 
 /* 字句を表すデータ型の定義 (caml2html: parser_token) */
@@ -66,8 +65,8 @@ simple_exp /* 括弧をつけなくても関数の引数になれる式 (caml2html: parser_simple) 
 | INT
     { $$ = new Int($1); }
 | FLOAT
-    { $$ = new syntax.Float($1); }
-| IDENT { $$ = new Var((id.T)$1); }
+    { $$ = new Syntax.Float($1); }
+| IDENT { $$ = new Var((Id.T)$1); }
 | simple_exp DOT LPAREN exp RPAREN
     { $$ = new Get((T)$1, (T)$4); }
 
@@ -80,8 +79,8 @@ exp /* 一般の式 (caml2html: parser_exp) */
 | MINUS exp
     %prec prec_unary_minus
     {
-        if ($2 instanceof syntax.Float) {
-            $$ = new syntax.Float(-((syntax.Float)$2).a());
+        if ($2 instanceof Syntax.Float) {
+            $$ = new Syntax.Float(-((Syntax.Float)$2).a());
             // -1.23などは型エラーではないので別扱い
         } else {
             $$ = new Neg((T)$2);
@@ -119,7 +118,7 @@ exp /* 一般の式 (caml2html: parser_exp) */
     { $$ = new FDiv((T)$1, (T)$3); }
 | LET IDENT EQUAL exp IN exp
     %prec prec_let
-    { $$ = new Let(addtyp((id.T)$2), (T)$4, (T)$6); }
+    { $$ = new Let(addtyp((Id.T)$2), (T)$4, (T)$6); }
 | LET REC fundef IN exp
     %prec prec_let
     { $$ = new LetRec((Fundef)$3, (T)$5); }
@@ -127,13 +126,13 @@ exp /* 一般の式 (caml2html: parser_exp) */
     %prec prec_app
     { $$ = new App((T)$1, (scala.List<T>)$2); }
 | elems
-    { $$ = new syntax.Tuple(list((T)$1)); }
+    { $$ = new Syntax.Tuple(list((T)$1)); }
 | LET LPAREN pat RPAREN EQUAL exp IN exp
-    { $$ = new LetTuple((scala.List<scala.Tuple2<id.T,typ.T>>)$3, (T)$6, (T)$8); }
+    { $$ = new LetTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)$3, (T)$6, (T)$8); }
 | simple_exp DOT LPAREN exp RPAREN LESS_MINUS exp
     { $$ = new Put((T)$1, (T)$4, (T)$7); }
 | exp SEMICOLON exp
-    { $$ = new Let(tuple2(id.Id.gentmp(new typ.Unit()), new typ.Unit()), (T)$1, (T)$3); }
+    { $$ = new Let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)$1, (T)$3); }
 | ARRAY_CREATE simple_exp simple_exp
     %prec prec_app
     { $$ = new Array((T)$2, (T)$3); }
@@ -146,13 +145,13 @@ exp /* 一般の式 (caml2html: parser_exp) */
 
 fundef
 : IDENT formal_args EQUAL exp
-    { $$ = new Fundef(addtyp((id.T)$1), (scala.List<scala.Tuple2<id.T,typ.T>>)$2, (T)$4); }
+    { $$ = new Fundef(addtyp((Id.T)$1), (scala.List<scala.Tuple2<Id.T,Type.T>>)$2, (T)$4); }
 
 formal_args
 : IDENT formal_args
-    { $$ = addList2(addtyp((id.T)$1),(scala.List<scala.Tuple2<id.T,typ.T>>)$2); }
+    { $$ = addList2(addtyp((Id.T)$1),(scala.List<scala.Tuple2<Id.T,Type.T>>)$2); }
 | IDENT
-    { $$ = list2(addtyp((id.T)$1)); }
+    { $$ = list2(addtyp((Id.T)$1)); }
 
 actual_args
 : actual_args simple_exp
@@ -170,9 +169,9 @@ elems
 
 pat
 : pat COMMA IDENT
-    { $$ = concatList2((scala.List<scala.Tuple2<id.T,typ.T>>)$1, list2(addtyp((id.T)$3))); }
+    { $$ = concatList2((scala.List<scala.Tuple2<Id.T,Type.T>>)$1, list2(addtyp((Id.T)$3))); }
 | IDENT COMMA IDENT
-    { $$ = addList2(addtyp((id.T)$1),list2(addtyp((id.T)$3))); }
+    { $$ = addList2(addtyp((Id.T)$1),list2(addtyp((Id.T)$3))); }
 
 %%
   public Yylex lexer;
@@ -201,6 +200,6 @@ pat
     System.out.println(yyparser.yyparse());
     System.out.println(yyparser.yyval.obj);
 
-	System.out.println(typing.Typing.f((syntax.T)yyparser.yyval.obj));
+	System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
 
   }

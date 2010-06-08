@@ -13,19 +13,19 @@
 
 
 
+package mincaml;
 
 
 
 //#line 2 "parser.y"
   import java.io.*;
-  import syntax.*;
-//#line 20 "Parser.java"
+//#line 19 "Parser.java"
 
 
 
 
 public class Parser
-             extends Syntax
+             extends mincaml.Syntax
 {
 
 boolean yydebug;        //do I want debug output?
@@ -585,7 +585,7 @@ final static String yyrule[] = {
 "pat : IDENT COMMA IDENT",
 };
 
-//#line 178 "parser.y"
+//#line 177 "parser.y"
   public Yylex lexer;
 
   public int yylex () {
@@ -612,10 +612,10 @@ final static String yyrule[] = {
     System.out.println(yyparser.yyparse());
     System.out.println(yyparser.yyval.obj);
 
-	System.out.println(typing.Typing.f((syntax.T)yyparser.yyval.obj));
+	System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
 
   }
-//#line 546 "Parser.java"
+//#line 545 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -770,46 +770,46 @@ boolean doaction;
       {
 //########## USER-SUPPLIED ACTIONS ##########
 case 1:
-//#line 61 "parser.y"
+//#line 60 "parser.y"
 { yyval.obj = val_peek(1).obj; }
 break;
 case 2:
-//#line 63 "parser.y"
+//#line 62 "parser.y"
 { yyval.obj = new Unit(); }
 break;
 case 3:
-//#line 65 "parser.y"
+//#line 64 "parser.y"
 { yyval.obj = new Bool((Boolean)val_peek(0).obj); }
 break;
 case 4:
-//#line 67 "parser.y"
+//#line 66 "parser.y"
 { yyval.obj = new Int(val_peek(0).ival); }
 break;
 case 5:
-//#line 69 "parser.y"
-{ yyval.obj = new syntax.Float(val_peek(0).dval); }
+//#line 68 "parser.y"
+{ yyval.obj = new Syntax.Float(val_peek(0).dval); }
 break;
 case 6:
-//#line 70 "parser.y"
-{ yyval.obj = new Var((id.T)val_peek(0).obj); }
+//#line 69 "parser.y"
+{ yyval.obj = new Var((Id.T)val_peek(0).obj); }
 break;
 case 7:
-//#line 72 "parser.y"
+//#line 71 "parser.y"
 { yyval.obj = new Get((T)val_peek(4).obj, (T)val_peek(1).obj); }
 break;
 case 8:
-//#line 76 "parser.y"
+//#line 75 "parser.y"
 { yyval.obj = val_peek(0).obj; }
 break;
 case 9:
-//#line 79 "parser.y"
+//#line 78 "parser.y"
 { yyval.obj = new Not((T)val_peek(0).obj); }
 break;
 case 10:
-//#line 82 "parser.y"
+//#line 81 "parser.y"
 {
-        if (val_peek(0).obj instanceof syntax.Float) {
-            yyval.obj = new syntax.Float(-((syntax.Float)val_peek(0).obj).a());
+        if (val_peek(0).obj instanceof Syntax.Float) {
+            yyval.obj = new Syntax.Float(-((Syntax.Float)val_peek(0).obj).a());
             /* -1.23Ç»Ç«ÇÕå^ÉGÉâÅ[Ç≈ÇÕÇ»Ç¢ÇÃÇ≈ï àµÇ¢*/
         } else {
             yyval.obj = new Neg((T)val_peek(0).obj);
@@ -817,130 +817,130 @@ case 10:
     }
 break;
 case 11:
-//#line 91 "parser.y"
+//#line 90 "parser.y"
 { yyval.obj = new Add((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 12:
-//#line 93 "parser.y"
+//#line 92 "parser.y"
 { yyval.obj = new Sub((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 13:
-//#line 95 "parser.y"
+//#line 94 "parser.y"
 { yyval.obj = new Eq((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 14:
-//#line 97 "parser.y"
+//#line 96 "parser.y"
 { yyval.obj = new Not(new Eq((T)val_peek(2).obj, (T)val_peek(0).obj)); }
 break;
 case 15:
-//#line 99 "parser.y"
+//#line 98 "parser.y"
 { yyval.obj = new Not(new Le((T)val_peek(0).obj, (T)val_peek(2).obj)); }
 break;
 case 16:
-//#line 101 "parser.y"
+//#line 100 "parser.y"
 { yyval.obj = new Not(new Le((T)val_peek(2).obj, (T)val_peek(0).obj)); }
 break;
 case 17:
-//#line 103 "parser.y"
+//#line 102 "parser.y"
 { yyval.obj = new Le((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 18:
-//#line 105 "parser.y"
+//#line 104 "parser.y"
 { yyval.obj = new Le((T)val_peek(0).obj, (T)val_peek(2).obj); }
 break;
 case 19:
-//#line 108 "parser.y"
+//#line 107 "parser.y"
 { yyval.obj = new If((T)val_peek(4).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 20:
-//#line 111 "parser.y"
+//#line 110 "parser.y"
 { yyval.obj = new FNeg((T)val_peek(0).obj); }
 break;
 case 21:
-//#line 113 "parser.y"
+//#line 112 "parser.y"
 { yyval.obj = new FAdd((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 22:
-//#line 115 "parser.y"
+//#line 114 "parser.y"
 { yyval.obj = new FSub((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 23:
-//#line 117 "parser.y"
+//#line 116 "parser.y"
 { yyval.obj = new FMul((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 24:
-//#line 119 "parser.y"
+//#line 118 "parser.y"
 { yyval.obj = new FDiv((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 25:
-//#line 122 "parser.y"
-{ yyval.obj = new Let(addtyp((id.T)val_peek(4).obj), (T)val_peek(2).obj, (T)val_peek(0).obj); }
+//#line 121 "parser.y"
+{ yyval.obj = new Let(addtyp((Id.T)val_peek(4).obj), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 26:
-//#line 125 "parser.y"
+//#line 124 "parser.y"
 { yyval.obj = new LetRec((Fundef)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 27:
-//#line 128 "parser.y"
+//#line 127 "parser.y"
 { yyval.obj = new App((T)val_peek(1).obj, (scala.List<T>)val_peek(0).obj); }
 break;
 case 28:
-//#line 130 "parser.y"
-{ yyval.obj = new syntax.Tuple(list((T)val_peek(0).obj)); }
+//#line 129 "parser.y"
+{ yyval.obj = new Syntax.Tuple(list((T)val_peek(0).obj)); }
 break;
 case 29:
-//#line 132 "parser.y"
-{ yyval.obj = new LetTuple((scala.List<scala.Tuple2<id.T,typ.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
+//#line 131 "parser.y"
+{ yyval.obj = new LetTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 30:
-//#line 134 "parser.y"
+//#line 133 "parser.y"
 { yyval.obj = new Put((T)val_peek(6).obj, (T)val_peek(3).obj, (T)val_peek(0).obj); }
 break;
 case 31:
-//#line 136 "parser.y"
-{ yyval.obj = new Let(tuple2(id.Id.gentmp(new typ.Unit()), new typ.Unit()), (T)val_peek(2).obj, (T)val_peek(0).obj); }
+//#line 135 "parser.y"
+{ yyval.obj = new Let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 32:
-//#line 139 "parser.y"
+//#line 138 "parser.y"
 { yyval.obj = new Array((T)val_peek(1).obj, (T)val_peek(0).obj); }
 break;
 case 33:
-//#line 149 "parser.y"
-{ yyval.obj = new Fundef(addtyp((id.T)val_peek(3).obj), (scala.List<scala.Tuple2<id.T,typ.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
+//#line 148 "parser.y"
+{ yyval.obj = new Fundef(addtyp((Id.T)val_peek(3).obj), (scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 34:
-//#line 153 "parser.y"
-{ yyval.obj = addList2(addtyp((id.T)val_peek(1).obj),(scala.List<scala.Tuple2<id.T,typ.T>>)val_peek(0).obj); }
+//#line 152 "parser.y"
+{ yyval.obj = addList2(addtyp((Id.T)val_peek(1).obj),(scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(0).obj); }
 break;
 case 35:
-//#line 155 "parser.y"
-{ yyval.obj = list2(addtyp((id.T)val_peek(0).obj)); }
+//#line 154 "parser.y"
+{ yyval.obj = list2(addtyp((Id.T)val_peek(0).obj)); }
 break;
 case 36:
-//#line 160 "parser.y"
+//#line 159 "parser.y"
 { yyval.obj = concatList((scala.List<T>)val_peek(1).obj, list((T)val_peek(0).obj)); }
 break;
 case 37:
-//#line 163 "parser.y"
+//#line 162 "parser.y"
 { yyval.obj = list((T)val_peek(0).obj); }
 break;
 case 38:
-//#line 167 "parser.y"
+//#line 166 "parser.y"
 { yyval.obj = concatList((scala.List<T>)val_peek(2).obj, list((T)val_peek(0).obj)); }
 break;
 case 39:
-//#line 169 "parser.y"
+//#line 168 "parser.y"
 { yyval.obj = addList((T)val_peek(2).obj,list((T)val_peek(0).obj)); }
 break;
 case 40:
-//#line 173 "parser.y"
-{ yyval.obj = concatList2((scala.List<scala.Tuple2<id.T,typ.T>>)val_peek(2).obj, list2(addtyp((id.T)val_peek(0).obj))); }
+//#line 172 "parser.y"
+{ yyval.obj = concatList2((scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(2).obj, list2(addtyp((Id.T)val_peek(0).obj))); }
 break;
 case 41:
-//#line 175 "parser.y"
-{ yyval.obj = addList2(addtyp((id.T)val_peek(2).obj),list2(addtyp((id.T)val_peek(0).obj))); }
+//#line 174 "parser.y"
+{ yyval.obj = addList2(addtyp((Id.T)val_peek(2).obj),list2(addtyp((Id.T)val_peek(0).obj))); }
 break;
-//#line 866 "Parser.java"
+//#line 865 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####
