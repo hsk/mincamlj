@@ -1,4 +1,4 @@
-Mincamlj
+Mincamlj は mincamlをScalaとJavaに移植してJVM上でmincamlのコンパイラを動作させるプロジェクトです。
 
 commit
 
