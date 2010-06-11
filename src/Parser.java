@@ -611,11 +611,9 @@ final static String yyrule[] = {
     Parser yyparser = new Parser(new FileReader(args[0]));
     System.out.println(yyparser.yyparse());
     System.out.println(yyparser.yyval.obj);
-
-	System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
-
+    System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
   }
-//#line 545 "Parser.java"
+//#line 543 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -874,7 +872,7 @@ case 24:
 break;
 case 25:
 //#line 121 "parser.y"
-{ yyval.obj = new Let(addtyp((Id.T)val_peek(4).obj), (T)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = let(addtyp((Id.T)val_peek(4).obj), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 26:
 //#line 124 "parser.y"
@@ -882,15 +880,15 @@ case 26:
 break;
 case 27:
 //#line 127 "parser.y"
-{ yyval.obj = new App((T)val_peek(1).obj, (scala.List<T>)val_peek(0).obj); }
+{ yyval.obj = app((T)val_peek(1).obj, (scala.List<T>)val_peek(0).obj); }
 break;
 case 28:
 //#line 129 "parser.y"
-{ yyval.obj = new Syntax.Tuple(list((T)val_peek(0).obj)); }
+{ yyval.obj = tuple(list((T)val_peek(0).obj)); }
 break;
 case 29:
 //#line 131 "parser.y"
-{ yyval.obj = new LetTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = letTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 30:
 //#line 133 "parser.y"
@@ -898,7 +896,7 @@ case 30:
 break;
 case 31:
 //#line 135 "parser.y"
-{ yyval.obj = new Let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 32:
 //#line 138 "parser.y"
@@ -906,7 +904,7 @@ case 32:
 break;
 case 33:
 //#line 148 "parser.y"
-{ yyval.obj = new Fundef(addtyp((Id.T)val_peek(3).obj), (scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = fundef(addtyp((Id.T)val_peek(3).obj), (scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 34:
 //#line 152 "parser.y"
@@ -940,7 +938,7 @@ case 41:
 //#line 174 "parser.y"
 { yyval.obj = addList2(addtyp((Id.T)val_peek(2).obj),list2(addtyp((Id.T)val_peek(0).obj))); }
 break;
-//#line 865 "Parser.java"
+//#line 863 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

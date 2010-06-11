@@ -29,7 +29,12 @@ class Syntax {
 	case class Get(a:T, b:T) extends T
 	case class Put(a:T, b:T, c:T) extends T
 	case class Fundef(name:(Id.T, Type.T), args:List[(Id.T,Type.T)], body:T)
-
+	def app(a:T, b:List[T]):T = App(a,b)
+	def tuple(a:List[T]):T = Tuple(a)
+	def letTuple(a:List[(Id.T,Type.T)] ,b:T, c:T):T = LetTuple(a,b,c)
+	def fundef(name:(Id.T, Type.T), args:List[(Id.T,Type.T)], body:T):Fundef = Fundef(name,args,body)
+	
+	def let(a:(Id.T, Type.T), c:T, b:T):T = Let(a,c,b)
 	def addtyp(x:Id.T):(Id.T,Type.T) = (x, Type.gentyp ())
 
 	def tuple2(a:Id.T,b:Type.T):(Id.T,Type.T) = (a, b)

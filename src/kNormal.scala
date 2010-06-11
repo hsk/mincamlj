@@ -1,10 +1,10 @@
 package mincaml;
-/* give names to intermediate values (K-normalization) */
 
-/* K正規化後の式 (caml2html: knormal_t) */
+// give names to intermediate values (K-normalization)
 
-object kNormal {
+// K正規化後の式 (caml2html: knormal_t)
 
+class kNormal {
 	sealed abstract class T();
 	case class Unit() extends T;
 	case class Int(a:Int) extends T;
@@ -30,8 +30,12 @@ object kNormal {
 	case class ExtArray(a:Id.T) extends T;
 	case class ExtFunApp(a:Id.T, b:List[Id.T]) extends T;
 	case class Fundef(name:(Id.T, Type.T), args:List[(Id.T, Type.T)], body:t);
+}
 
-	/* 式に出現する（自由な）変数 (caml2html: knormal_fv) */
+object kNormal extends kNormal {
+
+
+	// 式に出現する（自由な）変数 (caml2html: knormal_fv)
 /*
 	def fv(e:T):S.t = e match {
 		case Unit() | Int(_) | Float(_) | ExtArray(_) => S.empty()
@@ -59,7 +63,7 @@ object kNormal {
 	}
 */
 
-	/* letを挿入する補助関数 (caml2html: knormal_insert) */
+	// letを挿入する補助関数 (caml2html: knormal_insert)
 	def insert_let(e1:(T, Type.T), k:(Id.T)=>(T, T)):(T, T) = e1 match {
 		case (e,Var(x)) => k(x)
 		case (e,t) =>
@@ -68,17 +72,17 @@ object kNormal {
 			(Let((x, t), e, edash), tdash)
 	}
 
-	/* K正規化ルーチン本体 (caml2html: knormal_g) */
-	def g(env:HashMap[Any,Option[Type.T]])(e):(T,Type.T) = e match {
-		case syntax.Unit() => (Unit, Type.Unit)
-		case syntax.Bool(b) => (Int(if(b) 1 else 0), Type.Int) // 論理値true, falseを整数1, 0に変換 (caml2html: knormal_bool)
-		case syntax.Int(i) => (Int(i), Type.Int)
-		case syntax.Float(d) => (Float(d), Type.Float)
-		case syntax.Not(e) => g(env, syntax.If(e, syntax.Bool(false), syntax.Bool(true)))
-		case syntax.Neg(e) => insert_let(g(env, e), x => (Neg(x), Type.Int))
+	// K正規化ルーチン本体 (caml2html: knormal_g)
+	def g(env:HashMap[Any,Option[Type.T]], e:Syntax.T):(T, Type.T) = e match {
+		case Syntax.Unit() => (Unit, Type.Unit)
+		case Syntax.Bool(b) => (Int(if(b) 1 else 0), Type.Int) // 論理値true, falseを整数1, 0に変換 (caml2html: knormal_bool)
+		case Syntax.Int(i) => (Int(i), Type.Int)
+		case Syntax.Float(d) => (Float(d), Type.Float)
+		case Syntax.Not(e) => g(env, Syntax.If(e, Syntax.Bool(false), Syntax.Bool(true)))
+		case Syntax.Neg(e) => insert_let(g(env, e), x => (Neg(x), Type.Int))
 
 		// 足し算のK正規化 (caml2html: knormal_add)
-		case syntax.Add(e1, e2) =>
+		case Syntax.Add(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -86,7 +90,7 @@ object kNormal {
 					y => (Add(x, y), Type.Int)
 				)
 			)
-		case syntax.Sub(e1, e2) =>
+		case Syntax.Sub(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -94,12 +98,12 @@ object kNormal {
 					y => (Sub(x, y), Type.Int)
 				)
 			)
-		case syntax.FNeg(e) =>
+		case Syntax.FNeg(e) =>
 			insert_let(
 				g(env, e),
 				x => (FNeg(x), Type.Float)
 			)
-		case syntax.FAdd(e1, e2) =>
+		case Syntax.FAdd(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -107,7 +111,7 @@ object kNormal {
 					y => (FAdd(x, y), Type.Float)
 				)
 			)
-		case syntax.FSub(e1, e2) =>
+		case Syntax.FSub(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -115,7 +119,7 @@ object kNormal {
 					y => (FSub(x, y), Type.Float)
 				)
 			)
-		case syntax.FMul(e1, e2) =>
+		case Syntax.FMul(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -123,7 +127,7 @@ object kNormal {
 					y => (FMul(x, y), Type.Float)
 				)
 			)
-		case syntax.FDiv(e1, e2) =>
+		case Syntax.FDiv(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -131,10 +135,10 @@ object kNormal {
 					y => (FDiv(x, y), Type.Float)
 				)
 			)
-		case cmp@(syntax.Eq(_) | yntax.LE(_))=>
-			g(env, syntax.If(cmp, syntax.Bool(true), syntax.Bool(false)))
-		case syntax.If(syntax.Not(e1), e2, e3) => g(env, syntax.If(e1, e3, e2)) // notによる分岐を変換 (caml2html: knormal_not)
-		case syntax.If(syntax.Eq(e1, e2), e3, e4) =>
+		case cmp@(Syntax.Eq(_) | yntax.LE(_))=>
+			g(env, Syntax.If(cmp, Syntax.Bool(true), Syntax.Bool(false)))
+		case Syntax.If(Syntax.Not(e1), e2, e3) => g(env, Syntax.If(e1, e3, e2)) // notによる分岐を変換 (caml2html: knormal_not)
+		case Syntax.If(Syntax.Eq(e1, e2), e3, e4) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -146,11 +150,11 @@ object kNormal {
 					}
 				)
 			)
-		case syntax.If(syntax.LE(e1, e2), e3, e4) =>
+		case Syntax.If(Syntax.LE(e1, e2), e3, e4) =>
 			insert_let(
-				g(env, e1)
+				g(env, e1, _),
 				x => insert_let(
-					g(env, e2),
+					g(env, e2, _),
 					y => {
 						val (e3dash, t3) = g(env, e3);
 						val (e4dash, t4) = g(env, e4);
@@ -158,27 +162,27 @@ object kNormal {
 					}
 				)
 			)
-		case syntax.If(e1, e2, e3) =>
-			g(env, syntax.If(syntax.Eq(e1, syntax.Bool(false)), e3, e2) // 比較のない分岐を変換 (caml2html: knormal_if)
-		case syntax.Let((x, t), e1, e2) =>
+		case Syntax.If(e1, e2, e3) =>
+			g(env, Syntax.If(Syntax.Eq(e1, Syntax.Bool(false)), e3, e2)) // 比較のない分岐を変換 (caml2html: knormal_if)
+		case Syntax.Let((x, t), e1, e2) =>
 			val (e1dash, t1) = g(env, e1);
-			val (e2dash, t2) = g(M.add(x, t, env), e2);
+			val (e2dash, t2) = { env + (x -> t); g(env, e2); }
 			(Let((x, t), e1dash, e2dash), t2)
-		case syntax.Var(x) if(M.mem(x, env)) => (Var(x), M.find(x,env))
-		case syntax.Var(x) => // 外部配列の参照 (caml2html: knormal_extarray)
-			M.find(x, !Typing.extenv) match {
+		case Syntax.Var(x) if(env.contains(x)) => (Var(x), env(x))
+		case Syntax.Var(x) => // 外部配列の参照 (caml2html: knormal_extarray)
+			Typing.extenv(x) match {
 				case t@Type.Array(_) => (ExtArray(x), t)
 				case _ => throw new Exception("external variable "+ x +" does not have an array type")
 			}
-		case syntax.LetRec(syntax.Fundef((x, t),yts,e1), e2) =>
-			val envdash = M.add(x, t, env)
+		case Syntax.LetRec(Syntax.Fundef((x, t),yts,e1), e2) =>
+			val envdash = env; envdash + (x -> t)
 			val (e2dash, t2) = g(envdash, e2)
-			val (e1dash, t1) = g (M.add_list(yts, envdash), e1)
+			val (e1dash, t1) = g (add_list(yts, envdash), e1)
 			(LetRec(Fundef((x, t), yts, e1dash), e2dash), t2)
-		case syntax.App(syntax.Var(f), e2s) when not (M.mem f env) => // 外部関数の呼び出し (caml2html: knormal_extfunapp)
-			M.find(f, !Typing.extenv) match {
+		case Syntax.App(Syntax.Var(f), e2s) if (!env.contains(f)) => // 外部関数の呼び出し (caml2html: knormal_extfunapp)
+			Typing.extenv(f) match {
 				case Type.Fun(_, t) =>
-					val bind (xs,e) => e match {// "xs" are identifiers for the arguments 
+					val bind (xs, e) = e match {// "xs" are identifiers for the arguments 
 						case List() => (ExtFunApp(f, xs), t)
 						case e2 :: e2s =>
 							insert_let(
@@ -187,9 +191,9 @@ object kNormal {
 							)
 					}
 					bind(List(), e2s) // left-to-right evaluation
-				case _ => assert false
+				case _ => assert(false)
 			}
-		case syntax.App(e1, e2s) =>
+		case Syntax.App(e1, e2s) =>
 			g(env, e1) match {
 				case g_e1@(_, Type.Fun(_, t)) =>
 					insert_let(
@@ -208,26 +212,26 @@ object kNormal {
 					)
 				case _ => assert(false)
 			}
-		case syntax.Tuple(es) =>
+		case Syntax.Tuple(es) =>
 			val bind = (xs, ts, es) => es match { // "xs" and "ts" are identifiers and types for the elements
 			case List() => (Tuple(xs), Type.Tuple(ts))
 			case e :: es =>
-			    val g_e@(_, t) = g(env, e);
-			    insert_let(
+				val g_e@(_, t) = g(env, e);
+				insert_let(
 					g_e,
 					x => bind(xs ::: List(x), ts ::: List(t), es)
 				)
 			}
 			bind(List(), List(), es)
-		case syntax.LetTuple(xts, e1, e2) =>
+		case Syntax.LetTuple(xts, e1, e2) =>
 			insert_let(
 				g(env, e1),
 				y => {
-					val(e2dash, t2) = g((M.add_list(xts, env), e2);
+					val(e2dash, t2) = g(add_list(xts, env), e2);
 					(LetTuple(xts, y, e2dash), t2)
 				}
 			)
-		case syntax.Array(e1, e2) =>
+		case Syntax.Array(e1, e2) =>
 			insert_let(
 				g(env, e1),
 				x => {
@@ -244,7 +248,7 @@ object kNormal {
 					)
 				}
 			)
-		case syntax.Get(e1, e2) =>
+		case Syntax.Get(e1, e2) =>
 			g(env, e1) match {
 				case g_e1@(_, Type.Array(t)) =>
 					insert_let(
@@ -256,7 +260,7 @@ object kNormal {
 					)
 				case _ => assert(false)
 			}
-		case syntax.Put(e1, e2, e3) =>
+		case Syntax.Put(e1, e2, e3) =>
 			insert_let(
 				g(env, e1),
 				x => insert_let(
@@ -269,8 +273,19 @@ object kNormal {
 			)
 	}
 
-	def f(e:syntax.T):T = {
-		val (a,b) = g(new HashMap[Any,Option[Type.T]], e)
+	def f(e:Syntax.T):T = {
+		val (a, b) = g(new HashMap[Any, Option[Type.T]], e)
 		a
 	}
+
+	// add_list
+	def add_list(xys:List[(Id.T, Type.T)], env:HashMap[Any,Option[Type.T]]):HashMap[Any,Option[Type.T]] = {
+		xys.foldLeft(env) {
+			(x, y) => y match {
+			case (a, b) => env + (x->Some(b)); env
+			}
+		}
+		env
+	}
+
 }

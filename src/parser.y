@@ -118,21 +118,21 @@ exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
     { $$ = new FDiv((T)$1, (T)$3); }
 | LET IDENT EQUAL exp IN exp
     %prec prec_let
-    { $$ = new Let(addtyp((Id.T)$2), (T)$4, (T)$6); }
+    { $$ = let(addtyp((Id.T)$2), (T)$4, (T)$6); }
 | LET REC fundef IN exp
     %prec prec_let
     { $$ = new LetRec((Fundef)$3, (T)$5); }
 | exp actual_args
     %prec prec_app
-    { $$ = new App((T)$1, (scala.List<T>)$2); }
+    { $$ = app((T)$1, (scala.List<T>)$2); }
 | elems
-    { $$ = new Syntax.Tuple(list((T)$1)); }
+    { $$ = tuple(list((T)$1)); }
 | LET LPAREN pat RPAREN EQUAL exp IN exp
-    { $$ = new LetTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)$3, (T)$6, (T)$8); }
+    { $$ = letTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)$3, (T)$6, (T)$8); }
 | simple_exp DOT LPAREN exp RPAREN LESS_MINUS exp
     { $$ = new Put((T)$1, (T)$4, (T)$7); }
 | exp SEMICOLON exp
-    { $$ = new Let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)$1, (T)$3); }
+    { $$ = let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)$1, (T)$3); }
 | ARRAY_CREATE simple_exp simple_exp
     %prec prec_app
     { $$ = new Array((T)$2, (T)$3); }
@@ -145,7 +145,7 @@ exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
 
 fundef
 : IDENT formal_args EQUAL exp
-    { $$ = new Fundef(addtyp((Id.T)$1), (scala.List<scala.Tuple2<Id.T,Type.T>>)$2, (T)$4); }
+    { $$ = fundef(addtyp((Id.T)$1), (scala.List<scala.Tuple2<Id.T,Type.T>>)$2, (T)$4); }
 
 formal_args
 : IDENT formal_args
@@ -199,7 +199,5 @@ pat
     Parser yyparser = new Parser(new FileReader(args[0]));
     System.out.println(yyparser.yyparse());
     System.out.println(yyparser.yyval.obj);
-
-	System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
-
+    System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
   }

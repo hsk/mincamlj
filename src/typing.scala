@@ -1,14 +1,15 @@
 package mincaml;
-import scala.collection.mutable.HashMap;
+import scala.collection.immutable._;
 
 
 object Typing extends Syntax {
+
 	case class Unify(a:Type.T, b:Type.T) extends Exception
 	case class Error(a:T, b:Type.T, c:Type.T) extends Exception
 	case class Invalid() extends Exception
 
 	// type inference/reconstruction
-	var extenv = new HashMap[Any,Option[Type.T]]
+	var extenv:Map[Any,Option[Type.T]] = new HashMap[Any,Option[Type.T]]
 
 	// for pretty printing (and type normalization) 
 	// 型変数を中身でおきかえる関数
@@ -26,10 +27,11 @@ object Typing extends Syntax {
 			t1
 		case t => t
 	}
-	
+
 	def deref_id_typ (a:(Id.T, Type.T)):(Id.T, Type.T) = a match {
 		case (x,t) => (x, deref_typ(t))
 	}
+
 	def deref_term(e:T):T = e match {
 		case Not(e) => Not(deref_term(e))
 		case Neg(e) => Neg(deref_term(e))
@@ -82,14 +84,10 @@ object Typing extends Syntax {
 		case a => throw new Invalid()
 	}
 
-	def add_list(xys:List[(Id.T, Type.T)], env:HashMap[Any,Option[Type.T]]):HashMap[Any,Option[Type.T]] = {
+	def add_list(xys:List[(Id.T, Type.T)], env:Map[Any, Option[Type.T]]):Map[Any, Option[Type.T]] = {
 		xys.foldLeft(env) {
-			(x,y) => y match {
-			case (a, b) => env + (x->Some(b))
-			}
-			env
+		case (env, (k, v)) => env + (k->Some(v))
 		}
-		env
 	}
 
 	// 型が合うように、型変数への代入をする
@@ -128,18 +126,18 @@ object Typing extends Syntax {
 		}
 	}
 
-	def snd(a:(Id.T,Type.T)):Type.T = a match {case (_,b) => b }
-	def g1(env:HashMap[Any,Option[Type.T]]):(T)=>Type.T = g(env,_)
+	def snd(a:(Id.T, Type.T)):Type.T = a match {case (_,b) => b }
+	def g1(env:Map[Any,Option[Type.T]]):(T)=>Type.T = g(env,_)
 	// 型推論ルーチン
-	def g(env:HashMap[Any,Option[Type.T]], e:T):Type.T = try {
+	def g(env:Map[Any,Option[Type.T]], e:T):Type.T = try {
 		def gint(e1:T,e2:T):Type.T = {
 			unify(Type.Int(), g(env, e1))
-			unify(Type.Int(), g(env,e2))
+			unify(Type.Int(), g(env, e2))
 			Type.Int()
 		}
 		def gfloat(e1:T, e2:T):Type.T = {
-			unify(Type.Float(), g(env,e1))
-			unify(Type.Float(), g(env,e2))
+			unify(Type.Float(), g(env, e1))
+			unify(Type.Float(), g(env, e2))
 			Type.Float()
 		}
 		def gbool(e1:T, e2:T):Type.T = {
@@ -147,68 +145,68 @@ object Typing extends Syntax {
 			Type.Bool()
 		}
 		e match {
-		case Unit() => Type.Unit()
-		case Bool(_) => Type.Bool()
-		case Int(_) => Type.Int()
-		case Float(_) => Type.Float()
-		case Not(e) => unify(Type.Bool(),g(env, e)); Type.Bool()
-		case Neg(e) => unify(Type.Int(),g(env, e)); Type.Int()
-		case Add(e1, e2) => gint(e1,e2)
-		case Sub(e1, e2) => gint(e1,e2) // 足し算（と引き算）の型推論
-		case FNeg(e) => unify(Type.Float(), g(env, e)); Type.Float()
-		case FAdd(e1, e2) => gfloat(e1,e2)
-		case FSub(e1, e2) => gfloat(e1,e2)
-		case FMul(e1, e2) => gfloat(e1,e2)
-		case FDiv(e1, e2) => gfloat(e1,e2)
-		case Eq(e1, e2) => gbool(e1,e2)
-		case Le(e1, e2) => gbool(e1,e2)
-		case If(e1, e2, e3) =>
-			unify(g(env, e1), Type.Bool())
-			val t2 = g(env, e2)
-			val t3 = g(env, e3)
-			unify(t2, t3)
-			t2
-		case Let((x, t), e1, e2) => // letの型推論
-			unify(t, g(env,e1));
-			print(e + " env="+env+ " x="+x+ " t = "+ t);
-			env + (x -> Some(t));
-			g(env, e2)
-		case Var(x) if (env.get(x)!=None) => env.get(x).get.get // 変数の型推論
-		case Var(x) if (extenv.get(x)!=None) => extenv.get(x).get.get
-		case a@Var(x) => // 外部変数の型推論
-			val t = Type.gentyp()
-			println("free variable "+ x + " assumed as external "+a+"."+t)
-			extenv + (x-> Some(t))
-			t
-		case LetRec(Fundef((x, t),yts,e1), e2) => // let recの型推論
-			env + (x -> Some(t))
-			unify(t, Type.Fun(
-				yts.map(snd), g(add_list(yts, env), e1)
-			))
-			g(env, e2)
-		case App(e, es) => // 関数適用の型推論
-			val t = Type.gentyp()
-			val a = es.map(g1(env));
-			val b = g(env, e);
-			unify (b, Type.Fun(a, t))
-			t
-		case Tuple(es) => Type.Tuple(es.map(g1(env)))
-		case LetTuple(xts, e1, e2) =>
-			unify (Type.Tuple(xts.map(snd)), g(env, e1))
-			g(add_list(xts, env), e2)
-		case Array(e1, e2) => // must be a primitive for "polymorphic" typing
-			unify(g(env, e1), Type.Int())
-			Type.Array(g(env, e2))
-		case Get(e1, e2) =>
-			val t = Type.gentyp()
-			unify(Type.Array(t), g(env, e1))
-			unify(Type.Int(), g(env, e2))
-			t
-		case Put(e1, e2, e3) =>
-			val t = g(env, e3)
-			unify(Type.Array(t), g(env,e1))
-			unify(Type.Int(), g(env, e2))
-			Type.Unit()
+			case Unit() => Type.Unit()
+			case Bool(_) => Type.Bool()
+			case Int(_) => Type.Int()
+			case Float(_) => Type.Float()
+			case Not(e) => unify(Type.Bool(),g(env, e)); Type.Bool()
+			case Neg(e) => unify(Type.Int(),g(env, e)); Type.Int()
+			case Add(e1, e2) => gint(e1,e2)
+			case Sub(e1, e2) => gint(e1,e2) // 足し算（と引き算）の型推論
+			case FNeg(e) => unify(Type.Float(), g(env, e)); Type.Float()
+			case FAdd(e1, e2) => gfloat(e1,e2)
+			case FSub(e1, e2) => gfloat(e1,e2)
+			case FMul(e1, e2) => gfloat(e1,e2)
+			case FDiv(e1, e2) => gfloat(e1,e2)
+			case Eq(e1, e2) => gbool(e1,e2)
+			case Le(e1, e2) => gbool(e1,e2)
+			case If(e1, e2, e3) =>
+				unify(g(env, e1), Type.Bool())
+				val t2 = g(env, e2)
+				val t3 = g(env, e3)
+				unify(t2, t3)
+				t2
+			case Let((x, t), e1, e2) => // letの型推論
+				unify(t, g(env,e1));
+				print(e + " env="+env+ " x="+x+ " t = "+ t);
+				env + (x -> Some(t));
+				g(env, e2)
+			case Var(x) if (env(x) != None) => env(x).get // 変数の型推論
+			case Var(x) if (extenv(x) != None) => extenv(x).get
+			case a@Var(x) => // 外部変数の型推論
+				val t = Type.gentyp()
+				println("free variable "+ x + " assumed as external "+a+"."+t)
+				extenv = extenv + (x-> Some(t))
+				t
+			case LetRec(Fundef((x, t),yts,e1), e2) => // let recの型推論
+				env + (x -> Some(t))
+				unify(t, Type.Fun(
+					yts.map(snd), g(add_list(yts, env), e1)
+				))
+				g(env, e2)
+			case App(e, es) => // 関数適用の型推論
+				val t = Type.gentyp()
+				val a = es.map(g1(env));
+				val b = g(env, e);
+				unify (b, Type.Fun(a, t))
+				t
+			case Tuple(es) => Type.Tuple(es.map(g1(env)))
+			case LetTuple(xts, e1, e2) =>
+				unify (Type.Tuple(xts.map(snd)), g(env, e1))
+				g(add_list(xts, env), e2)
+			case Array(e1, e2) => // must be a primitive for "polymorphic" typing
+				unify(g(env, e1), Type.Int())
+				Type.Array(g(env, e2))
+			case Get(e1, e2) =>
+				val t = Type.gentyp()
+				unify(Type.Array(t), g(env, e1))
+				unify(Type.Int(), g(env, e2))
+				t
+			case Put(e1, e2, e3) =>
+				val t = g(env, e3)
+				unify(Type.Array(t), g(env,e1))
+				unify(Type.Int(), g(env, e2))
+				Type.Unit()
 		}
 	} catch {
 		case a@Unify(t1, t2) =>
@@ -218,20 +216,22 @@ object Typing extends Syntax {
 	}
 
 	def f(e:T):T = try {
-		extenv = new HashMap[Any,Option[Type.T]]
+		extenv = new HashMap[Any,Option[Type.T]]()
 /*		deref_typ(g(new HashMap[Any,Option[Type.T]], e)) match {
-		case Type.Unit() => Unit
-		case a => println("warning: final result does not have type unit"+a+"."); Unit
+			case Type.Unit() => Unit
+			case a => println("warning: final result does not have type unit"+a+"."); Unit
 		}*/
 		try {
-			unify(Type.Unit(), g(new HashMap[Any,Option[Type.T]],e))
+			unify(Type.Unit(), g(new HashMap[Any, Option[Type.T]], e))
 		} catch {
-		case a@Unify(_,_) => a.printStackTrace(); throw new Exception("top level does not have type unit"+a.a+" "+a.b);
+			case a@Unify(_,_) =>
+				a.printStackTrace();
+				throw new Exception("top level does not have type unit"+a.a+" "+a.b);
 		}
 
 		def deref(a:(Any, Option[Type.T])) {
 			a match {
-			case (x,Some(y)) => extenv.update(x,Some(deref_typ(y)))
+			case (x,Some(y)) => extenv = extenv + (x -> Some(deref_typ(y)))
 			case x =>
 			}
 		}
