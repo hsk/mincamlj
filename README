@@ -1,5 +1,6 @@
 Mincamlj は mincamlをScalaとJavaに移植してJVM上でmincamlのコンパイラを動作させるプロジェクトです。
-*clone
+
+*リポジトリの取得
 はじめにcloneを使ってリポジトリのコピーを作ります。
 
 git clone git@github.com:hsk/mincamlj.git
