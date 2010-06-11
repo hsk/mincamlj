@@ -1,6 +1,12 @@
 Mincamlj は mincamlをScalaとJavaに移植してJVM上でmincamlのコンパイラを動作させるプロジェクトです。
+*clone
+はじめにcloneを使ってリポジトリのコピーを作ります。
 
-commit
+git clone git@github.com:hsk/mincamlj.git
+
+*リポジトリへ登録
+ローカルにcommitしてから、
+pushでgithubにプッシュします。
 
 git commit -a
 git push origin master
