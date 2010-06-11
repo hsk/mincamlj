@@ -4,6 +4,10 @@ Mincamlj は mincamlをScalaとJavaに移植してJVM上でmincamlのコンパ�
 
 git clone git@github.com:hsk/mincamlj.git
 
+*リポジトリから最新版を取得
+
+git pull origin master
+
 *リポジトリへ登録
 ローカルにcommitしてから、
 pushでgithubにプッシュします。
