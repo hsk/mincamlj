@@ -31,38 +31,39 @@ class KNormal {
 	case class ExtArray(a:Id.T) extends T;
 	case class ExtFunApp(a:Id.T, b:List[Id.T]) extends T;
 	case class Fundef(name:(Id.T, Type.T), args:List[(Id.T, Type.T)], body:T);
+
+	// 式に出現する（自由な）変数 (caml2html: knormal_fv)
+
+	def fv(e:T):Set[Id.T] = e match {
+		case Unit() | Int(_) | Float(_) | ExtArray(_) => Set()
+		case Neg(x) => Set(x)
+		case FNeg(x) => Set(x)
+		case Add(x, y) => Set(x, y)
+		case Sub(x, y) => Set(x, y)
+		case FAdd(x, y) => Set(x, y)
+		case FSub(x, y) => Set(x, y)
+		case FMul(x, y) => Set(x, y)
+		case FDiv(x, y) => Set(x, y)
+		case IfEq(x, y, e1, e2) => fv(e1) ++ fv(e2) + y + x
+		case IfLE(x, y, e1, e2) => fv(e1) ++ fv(e2) + y + x
+		case Let((x, t), e1, e2) => fv(e1) ++ (fv(e2) - x)
+		case Var(x) => Set(x)
+		case LetRec(Fundef((x, t), yts, e1), e2) =>
+			val zs = fv(e1) ** (Set() ++ yts.map{case(a,_)=>a});
+			(zs ++ fv(e2)) ** Set(x)
+		case App(x, ys) => Set() ++ (x :: ys)
+		case Tuple(xs) => Set() ++ xs
+		case ExtFunApp(_, xs) => Set()++xs
+		case Put(x, y, z) => Set(x,y,z)
+		case Get(x, y) => Set(x, y)
+		case LetTuple(xs, y, e) => Set(y) ++ (fv(e) ** (Set()++xs.map{case(a,_)=>a}))
+	}
 }
 
 object KNormal extends KNormal {
 
 
-	// 式に出現する（自由な）変数 (caml2html: knormal_fv)
-/*
-	def fv(e:T):S.t = e match {
-		case Unit() | Int(_) | Float(_) | ExtArray(_) => S.empty()
-		case Neg(x) => S.singleton(x)
-		case FNeg(x) => S.singleton(x)
-		case Add(x, y) => S.of_list(List(x, y))
-		case Sub(x, y) => S.of_list(List(x, y))
-		case FAdd(x, y) => S.of_list(List(x, y))
-		case FSub(x, y) => S.of_list(List(x, y))
-		case FMul(x, y) => S.of_list(List(x, y))
-		case FDiv(x, y) => S.of_list(List(x, y))
-		case IfEq(x, y, e1, e2) => S.add(x, S.add(y, S.union(fv(e1),fv(e2))))
-		case IfLE(x, y, e1, e2) => S.add(x, S.add(y, S.union(fv(e1),fv(e2))))
-		case Let((x, t), e1, e2) => S.union(fv(e1), S.remove(x, fv(e2)))
-		case Var(x) => S.singleton(x)
-		case LetRec(Fundef((x, t), yts, e1), e2) =>
-			val zs = S.diff (fv(e1), S.of_list(yts.map(fst)));
-			S.diff(S.union(zs, fv(e2)), S.singleton(x))
-		case App(x, ys) => S.of_list(x :: ys)
-		case Tuple(xs) => S.of_list(xs)
-		case ExtFunApp(_, xs) => S.of_list(xs)
-		case Put(x, y, z) => S.of_list(List(x,y,z))
-		case Get(x, y) => S.of_list(List(x, y))
-		case LetTuple(xs, y, e) => S.add(y, S.diff(fv(e), S.of_list(xs.map(fst))))
-	}
-*/
+
 
 	// letを挿入する補助関数 (caml2html: knormal_insert)
 	def insert_let(e1:(T, Any), k:(Id.T)=>(T, Type.T)):(T, Type.T) = e1 match {
