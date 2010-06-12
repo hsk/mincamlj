@@ -12,9 +12,9 @@ object Id {
 	}
 
 	var counter = 0
-	def genid(s:String):String = {
+	def genid(s:Id.T):Id.T = {
 		counter += 1
-		s + "." + counter
+		T(s.s + "." + counter)
 	}
 
 	def id_of_typ(x:Type.T):String = x match {
