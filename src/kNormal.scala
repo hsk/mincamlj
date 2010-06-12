@@ -5,7 +5,7 @@ import scala.collection.immutable._;
 
 // K正規化後の式 (caml2html: knormal_t)
 
-class kNormal {
+class KNormal {
 	sealed abstract class T();
 	case class Unit() extends T;
 	case class Int(a:scala.Int) extends T;
@@ -33,7 +33,7 @@ class kNormal {
 	case class Fundef(name:(Id.T, Type.T), args:List[(Id.T, Type.T)], body:T);
 }
 
-object kNormal extends kNormal {
+object KNormal extends KNormal {
 
 
 	// 式に出現する（自由な）変数 (caml2html: knormal_fv)

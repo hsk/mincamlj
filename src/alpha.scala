@@ -3,7 +3,7 @@ package mincaml;
 // rename identifiers to make them unique (alpha-conversion)
 import scala.collection.immutable.HashMap;
 
-object Alpha extends kNormal{
+object Alpha extends KNormal{
 
 	def find(x:Id.T, env:Map[Id.T,Id.T]):Id.T = {
 		try {

@@ -12,5 +12,7 @@ call scala mincaml.Parser a.txt
 call scalac kNormal.scala
 call scalac alpha.scala
 call scalac beta.scala
+call scalac assoc.scala
+call scalac inline.scala
 
 javac -classpath "C:\Program Files\Scala\lib\scala-library.jar;." test.java

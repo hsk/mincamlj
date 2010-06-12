@@ -1,7 +1,7 @@
 package mincaml;
 import scala.collection.immutable.HashMap;
 
-object Beta extends kNormal {
+object Beta extends KNormal {
 
 	// 置換のための関数 (caml2html: beta_find)
 	def find(x:Id.T, env:Map[Id.T,Id.T]):Id.T = try {
