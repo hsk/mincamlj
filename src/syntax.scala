@@ -1,5 +1,7 @@
 package mincaml;
 
+object Syntax extends Syntax
+
 class Syntax {
 	// MinCamlの構文を表現するデータ型 (caml2html: Syntax)
 	sealed abstract case class T()
@@ -17,7 +19,7 @@ class Syntax {
 	case class FMul(a:T, b:T) extends T
 	case class FDiv(a:T, b:T) extends T
 	case class Eq(a:T, b:T) extends T
-	case class Le(a:T, b:T) extends T
+	case class LE(a:T, b:T) extends T
 	case class If(a:T, b:T, c:T) extends T
 	case class Let(a:(Id.T, Type.T), c:T, b:T) extends T
 	case class Var(b:Id.T) extends T

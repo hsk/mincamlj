@@ -9,7 +9,7 @@ object Typing extends Syntax {
 	case class Invalid() extends Exception
 
 	// type inference/reconstruction
-	var extenv:Map[Any,Option[Type.T]] = new HashMap[Any,Option[Type.T]]
+	var extenv:Map[Any,Type.T] = new HashMap[Any,Type.T]
 
 	// for pretty printing (and type normalization) 
 	// 型変数を中身でおきかえる関数
@@ -38,7 +38,7 @@ object Typing extends Syntax {
 		case Add(e1, e2) => Add(deref_term(e1), deref_term(e2))
 		case Sub(e1, e2) => Sub(deref_term(e1), deref_term(e2))
 		case Eq(e1, e2) => Eq(deref_term(e1), deref_term(e2))
-		case Le(e1, e2) => Le(deref_term(e1), deref_term(e2))
+		case LE(e1, e2) => LE(deref_term(e1), deref_term(e2))
 		case FNeg(e) => FNeg(deref_term(e))
 		case FAdd(e1, e2) => FAdd(deref_term(e1), deref_term(e2))
 		case FSub(e1, e2) => FSub(deref_term(e1), deref_term(e2))
@@ -84,9 +84,9 @@ object Typing extends Syntax {
 		case a => throw new Invalid()
 	}
 
-	def add_list(xys:List[(Id.T, Type.T)], env:Map[Any, Option[Type.T]]):Map[Any, Option[Type.T]] = {
+	def add_list(xys:List[(Id.T, Type.T)], env:Map[Any, Type.T]):Map[Any, Type.T] = {
 		xys.foldLeft(env) {
-		case (env, (k, v)) => env + (k->Some(v))
+		case (env, (k, v)) => env + (k->v)
 		}
 	}
 
@@ -127,9 +127,9 @@ object Typing extends Syntax {
 	}
 
 	def snd(a:(Id.T, Type.T)):Type.T = a match {case (_,b) => b }
-	def g1(env:Map[Any,Option[Type.T]]):(T)=>Type.T = g(env,_)
+	def g1(env:Map[Any,Type.T]):(T)=>Type.T = g(env,_)
 	// 型推論ルーチン
-	def g(env:Map[Any,Option[Type.T]], e:T):Type.T = try {
+	def g(env:Map[Any,Type.T], e:T):Type.T = try {
 		def gint(e1:T,e2:T):Type.T = {
 			unify(Type.Int(), g(env, e1))
 			unify(Type.Int(), g(env, e2))
@@ -159,7 +159,7 @@ object Typing extends Syntax {
 			case FMul(e1, e2) => gfloat(e1,e2)
 			case FDiv(e1, e2) => gfloat(e1,e2)
 			case Eq(e1, e2) => gbool(e1,e2)
-			case Le(e1, e2) => gbool(e1,e2)
+			case LE(e1, e2) => gbool(e1,e2)
 			case If(e1, e2, e3) =>
 				unify(g(env, e1), Type.Bool())
 				val t2 = g(env, e2)
@@ -168,15 +168,15 @@ object Typing extends Syntax {
 				t2
 			case Let((x, t), e1, e2) => // letの型推論
 				unify(t, g(env,e1));
-				print(e + " env="+env+ " x="+x+ " t = "+ t);
+				//print(e + " env="+env+ " x="+x+ " t = "+ t);
 				env + (x -> Some(t));
 				g(env, e2)
-			case Var(x) if (env(x) != None) => env(x).get // 変数の型推論
-			case Var(x) if (extenv(x) != None) => extenv(x).get
+			case Var(x) if (env.get(x) != None) => env(x) // 変数の型推論
+			case Var(x) if (extenv.get(x) != None) => extenv(x)
 			case a@Var(x) => // 外部変数の型推論
 				val t = Type.gentyp()
 				println("free variable "+ x + " assumed as external "+a+"."+t)
-				extenv = extenv + (x-> Some(t))
+				extenv = extenv + (x-> t)
 				t
 			case LetRec(Fundef((x, t),yts,e1), e2) => // let recの型推論
 				env + (x -> Some(t))
@@ -216,27 +216,30 @@ object Typing extends Syntax {
 	}
 
 	def f(e:T):T = try {
-		extenv = new HashMap[Any,Option[Type.T]]()
-/*		deref_typ(g(new HashMap[Any,Option[Type.T]], e)) match {
+		extenv = new HashMap[Any,Type.T]()
+/*		deref_typ(g(new HashMap[Any,Type.T], e)) match {
 			case Type.Unit() => Unit
 			case a => println("warning: final result does not have type unit"+a+"."); Unit
 		}*/
 		try {
-			unify(Type.Unit(), g(new HashMap[Any, Option[Type.T]], e))
+			unify(Type.Unit(), g(new HashMap[Any, Type.T], e))
 		} catch {
 			case a@Unify(_,_) =>
 				a.printStackTrace();
 				throw new Exception("top level does not have type unit"+a.a+" "+a.b);
 		}
 
-		def deref(a:(Any, Option[Type.T])) {
+		def deref(a:(Any, Type.T)) {
 			a match {
-			case (x,Some(y)) => extenv = extenv + (x -> Some(deref_typ(y)))
-			case x =>
+			case (x, y) => extenv = extenv + (x -> deref_typ(y))
 			}
 		}
+		println(extenv)
 		extenv.map(deref)
-		deref_term(e)
+		println(extenv)
+		var rc = deref_term(e)
+		println(extenv)
+		rc
 	} catch {
 		case ee =>  throw ee;
 	}

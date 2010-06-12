@@ -95,13 +95,13 @@ exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
 | exp LESS_GREATER exp
     { $$ = new Not(new Eq((T)$1, (T)$3)); }
 | exp LESS exp
-    { $$ = new Not(new Le((T)$3, (T)$1)); }
+    { $$ = new Not(new LE((T)$3, (T)$1)); }
 | exp GREATER exp
-    { $$ = new Not(new Le((T)$1, (T)$3)); }
+    { $$ = new Not(new LE((T)$1, (T)$3)); }
 | exp LESS_EQUAL exp
-    { $$ = new Le((T)$1, (T)$3); }
+    { $$ = new LE((T)$1, (T)$3); }
 | exp GREATER_EQUAL exp
-    { $$ = new Le((T)$3, (T)$1); }
+    { $$ = new LE((T)$3, (T)$1); }
 | IF exp THEN exp ELSE exp
     %prec prec_if
     { $$ = new If((T)$2, (T)$4, (T)$6); }

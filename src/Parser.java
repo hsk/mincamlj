@@ -832,19 +832,19 @@ case 14:
 break;
 case 15:
 //#line 98 "parser.y"
-{ yyval.obj = new Not(new Le((T)val_peek(0).obj, (T)val_peek(2).obj)); }
+{ yyval.obj = new Not(new LE((T)val_peek(0).obj, (T)val_peek(2).obj)); }
 break;
 case 16:
 //#line 100 "parser.y"
-{ yyval.obj = new Not(new Le((T)val_peek(2).obj, (T)val_peek(0).obj)); }
+{ yyval.obj = new Not(new LE((T)val_peek(2).obj, (T)val_peek(0).obj)); }
 break;
 case 17:
 //#line 102 "parser.y"
-{ yyval.obj = new Le((T)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = new LE((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 18:
 //#line 104 "parser.y"
-{ yyval.obj = new Le((T)val_peek(0).obj, (T)val_peek(2).obj); }
+{ yyval.obj = new LE((T)val_peek(0).obj, (T)val_peek(2).obj); }
 break;
 case 19:
 //#line 107 "parser.y"
