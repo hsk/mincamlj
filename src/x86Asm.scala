@@ -49,6 +49,15 @@ class X86Asm {
 
 	// プログラム全体 = 浮動小数定数テーブル + トップレベル関数 + メインの式 (caml2html: sparcasm_prog)
 	case class Prog(a:List[(Id.L, Double)],b:List[Fundef],c:T)
+
+	def align(i:Int):Int = {
+		if (i % 8 == 0) {
+			i
+		} else {
+			i + 4
+		}
+	}
+	def seq(e1:Exp, e2:T):T = Let((Id.gentmp(Type.Unit()), Type.Unit()), e1, e2)
 }
 
 object X86Asm extends X86Asm {
@@ -56,7 +65,6 @@ object X86Asm extends X86Asm {
 // val fletd : Id.T * Exp * T -> T = <fun>
 
 	def fletd(x:Id.T, e1:Exp, e2:T):T = Let((x, Type.Float()), e1, e2)
-	def seq(e1:Exp, e2:T):T = Let((Id.gentmp(Type.Unit()), Type.Unit()), e1, e2)
 
 	val regs = // Array.init 16 (fun i => Printf.sprintf "%%r%d" i)
 	  Array( "%eax", "%ebx", "%ecx", "%edx", "%esi", /*, "%edi" */ )
@@ -144,12 +152,5 @@ object X86Asm extends X86Asm {
 		case Ans(exp) => Let(xt, exp, e2)
 		case Let(yt, exp, e1) => Let(yt, exp, concat(e1, xt, e2))
 		case Forget(y, e1) => Forget(y, concat(e1, xt, e2))
-	}
-	def align(i:Int):Int = {
-		if (i % 8 == 0) {
-			i
-		} else {
-			i + 4
-		}
 	}
 }
