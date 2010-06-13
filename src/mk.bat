@@ -14,5 +14,10 @@ call scalac alpha.scala
 call scalac beta.scala
 call scalac assoc.scala
 call scalac inline.scala
+call scalac constFold.scala
+call scalac elim.scala
+call scalac closure.scala
+call scalac x86Asm.scala
+call scalac virtual.scala
 
 javac -classpath "C:\Program Files\Scala\lib\scala-library.jar;." test.java
