@@ -50,7 +50,7 @@ class X86Asm {
 	// プログラム全体 = 浮動小数定数テーブル + トップレベル関数 + メインの式 (caml2html: sparcasm_prog)
 	case class Prog(a:List[(Id.L, Double)],b:List[Fundef],c:T)
 
-	def align(i:Int):Int = {
+	def align(i:scala.Int):scala.Int = {
 		if (i % 8 == 0) {
 			i
 		} else {
@@ -58,9 +58,6 @@ class X86Asm {
 		}
 	}
 	def seq(e1:Exp, e2:T):T = Let((Id.gentmp(Type.Unit()), Type.Unit()), e1, e2)
-}
-
-object X86Asm extends X86Asm {
 
 // val fletd : Id.T * Exp * T -> T = <fun>
 
