@@ -13,8 +13,8 @@ object Virtual extends X86Asm {
 			classify(
 				xts,
 				(List[A](), List[A]()),
-				{case ((int1, float1), x)    => (int1, float1 ::: List(x))},
-				{case ((int2, float2), x, _) => (int2 ::: List(x), float2)}
+				{case ((int1, float1), x)    => (int1, float1 ::: List(x)) },
+				{case ((int2, float2), x, _) => (int2 ::: List(x), float2) }
 			)
 		}
 
@@ -56,10 +56,7 @@ object Virtual extends X86Asm {
 			classify(
 				xts,
 				ini,
-				{case ((offset, acc), x) =>
-					val offset2 = align(offset);
-					(offset2 + 8, addf(x, offset2, acc))
-				},
+				{case ((offset, acc), x) => val offset2 = align(offset); (offset2 + 8, addf(x, offset2, acc)) },
 				{case ((offset, acc), x, t) => (offset + 4, addi(x, t, offset, acc))}
 			)
 		}
@@ -85,9 +82,10 @@ object Virtual extends X86Asm {
 		case Closure.Unit() => Ans(Nop())
 		case Closure.Int(i) => Ans(SET(i))
 		case Closure.Float(d) =>
-			val l = data.find{case (_, ddash) => d == ddash} match {
-			case Some((l,_)) => l
-			case None =>
+			val v = data.find{case (_, ddash) => d == ddash}
+			val l = v match {
+				case Some((l,_)) => l
+				case None =>
 					val l = Id.L(Id.genid(Id.T("l")).s);
 					data = (l, d) :: data;
 					l
@@ -120,9 +118,9 @@ object Virtual extends X86Asm {
 			concat(e1dash, (x, t1), e2dash)
 		case Closure.Var(x) =>
 			env(x) match {
-				case Type.Unit() => Ans(Nop())
+				case Type.Unit()  => Ans(Nop())
 				case Type.Float() => Ans(FMovD(x))
-				case _ => Ans(Mov(x))
+				case _            => Ans(Mov(x))
 			}
 		case Closure.MakeCls((x, t), Closure.Closure(l, ys), e2) => // クロージャの生成 (caml2html: virtual_makecls)
 			// Closureのアドレスをセットしてから、自由変数の値をストア
@@ -134,18 +132,18 @@ object Virtual extends X86Asm {
 				(y, offset, store_fv) => seq(StDF(y, x, C(offset)), store_fv),
 				(y, _, offset, store_fv) => seq(St(y, x, C(offset)), store_fv)
 			);
-			Let((x, t), Mov(Id.T(reg_hp)),
+			Let(
+				(x, t),
+				Mov(Id.T(reg_hp)),
 				Let(
 					(Id.T(reg_hp), Type.Int()),
 					Add(Id.T(reg_hp), C(align(offset))),
 					{
 						val z = Id.genid(Id.T("l"));
 						Let(
-							(z, Type.Int()), SETL(l),
-							seq(
-								St(z, x, C(0)),
-								store_fv
-							)
+							(z, Type.Int()),
+							SETL(l),
+							seq(St(z, x, C(0)), store_fv)
 						)
 					}
 				)
@@ -165,13 +163,11 @@ object Virtual extends X86Asm {
 					(x, offset, store)    => seq(StDF(x, y, C(offset)), store),
 					(x, _, offset, store) => seq(St  (x, y, C(offset)), store)
 				);
-			Let((	y,
-					Type.Tuple(
-						xs.map{case x => env(x)}
-					)
-				),
+			Let(
+				(y, Type.Tuple(xs.map{case x => env(x)})),
 				Mov(Id.T(reg_hp)),
-				Let((Id.T(reg_hp), Type.Int()),
+				Let(
+					(Id.T(reg_hp), Type.Int()),
 					Add(Id.T(reg_hp), C(align(offset))),
 					store
 				)
