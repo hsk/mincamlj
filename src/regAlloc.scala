@@ -1,14 +1,15 @@
 package mincaml;
+import scala.collection.immutable._;
 
 object RegAlloc extends X86Asm {
 
 	// allocate a register or fail
-	def alloc(cont, regenv, x, t) = {
-		assert (not (M.mem(x, regenv)));
+	def alloc(cont, regenv, x, t:Type.T) = {
+		assert (!regenv.contains(x));
 		val all = t match {
-			case Type.Unit  => List("%g0") // dummy
-			case Type.Float => allfregs
-			case _          => allregs
+			case Type.Unit()  => List("%g0") // dummy
+			case Type.Float() => allfregs
+			case _            => allregs
 		}
 
 		if (all == List("%g0")) {
@@ -20,26 +21,20 @@ object RegAlloc extends X86Asm {
 			val free = fv(cont);
 			try {
 				val live = // 生きているレジスタ
-					List.fold_left(
-						(live,y) => {
-							if (is_reg(y)) {
-								S.add(y, live)
-							} else {
-								try {
-									S.add(M.find(y, regenv), live)
-								} catch {
-								case Not_found => live
-								}
+					free.foldLeft(S.empty){
+					case (live, y) =>
+						if (is_reg(y)) {
+							S.add(y, live)
+						} else {
+							try {
+								S.add(M.find(y, regenv), live)
+							} catch {
+							case Not_found => live
 							}
-						},
-						S.empty,
-						free
-					);
+						}
+					};
 				val r = // そうでないレジスタを探す
-					List.find(
-						r => not(S.mem(r, live)),
-						all
-					);
+					all.find{case r => !live.contains(r)};
 				// println("allocated " + x + " to " + r + "@.");
 				r
 			} catch {
@@ -54,7 +49,7 @@ object RegAlloc extends X86Asm {
 			assert (x == r);
 			regenv
 		} else {
-			M.add(x, r, regenv)
+			regenv + (x -> r)
 		}
 	}
 
@@ -66,15 +61,15 @@ object RegAlloc extends X86Asm {
 			x
 		}else {
 			try {
-				M.find(x, regenv)
+				regenv(x)
 			} catch {
-			case Not_found => throw new NoReg(x, t)
+			case _ => throw new NoReg(x, t)
 			}
 		}
 	}
 
-	def finddash(xdash, regenv) = xdash match {
-		case V(x) => V(find(x, Type.Int(), regenv))
+	def finddash(xdash:id_or_imm, regenv) = xdash match {
+		case V(x) => V(regenv((x, Type.Int())))
 		case c => c
 	}
 
@@ -129,6 +124,7 @@ object RegAlloc extends X86Asm {
 		case exp@CallDir(l, ys, zs)   => gdash_call(dest, cont, regenv, exp, (ys, zs) => CallDir(l, ys, zs), ys, zs)
 		case Save(x, y) => assert(false)
 	}
+
 	// ifのレジスタ割り当て (caml2html: regalloc_if)
 	def gdash_if(dest, cont, regenv, exp, constr, e1, e2) = {
 		val (e1dash, regenv1) = g(dest, cont, regenv, e1);
