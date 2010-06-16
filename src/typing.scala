@@ -215,7 +215,7 @@ object Typing extends Syntax {
 			throw new Error(deref_term(e), deref_typ(t1), deref_typ(t2))
 	}
 
-	def f(e:T):T = try {
+	def f1(e:T):T = try {
 		extenv = new HashMap[Any,Type.T]()
 /*		deref_typ(g(new HashMap[Any,Type.T], e)) match {
 			case Type.Unit() => Unit
@@ -243,4 +243,6 @@ object Typing extends Syntax {
 	} catch {
 		case ee =>  throw ee;
 	}
+	
+	def f(e:Syntax.T):Syntax.T = f1(e.asInstanceOf[T]).asInstanceOf[Syntax.T]
 }

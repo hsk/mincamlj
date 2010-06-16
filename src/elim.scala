@@ -15,12 +15,12 @@ object Elim extends KNormal {
 	}
 
 	// 不要定義削除ルーチン本体 (caml2html: elim_f)
-	def f(e:T):T = e match {
-		case IfEq(x, y, e1, e2) => IfEq(x, y, f(e1), f(e2))
-		case IfLE(x, y, e1, e2) => IfLE(x, y, f(e1), f(e2))
+	def g(e:T):T = e match {
+		case IfEq(x, y, e1, e2) => IfEq(x, y, g(e1), g(e2))
+		case IfLE(x, y, e1, e2) => IfLE(x, y, g(e1), g(e2))
 		case Let((x, t), e1, e2) => // letの場合 (caml2html: elim_let)
-			val e1dash = f(e1);
-			val e2dash = f(e2);
+			val e1dash = g(e1);
+			val e2dash = g(e2);
 			if (effect(e1dash) || fv(e2dash).contains(x) ) {
 				Let((x, t), e1dash, e2dash)
 			} else {
@@ -28,16 +28,16 @@ object Elim extends KNormal {
 				e2dash
 			}
 		case LetRec(Fundef((x, t),yts,e1), e2) => // let recの場合 (caml2html: elim_letrec)
-			val e2dash = f(e2);
+			val e2dash = g(e2);
 			if (fv(e2dash).contains(x)) {
-				LetRec(Fundef((x, t), yts, f(e1)), e2dash)
+				LetRec(Fundef((x, t), yts, g(e1)), e2dash)
 			} else {
 				println("eliminating function "+x+"@.");
 				e2dash
 			}
 		case LetTuple(xts, y, e) =>
 			val xs = xts.map{case(a,_)=>a};
-			val edash = f(e);
+			val edash = g(e);
 			val live = fv(edash);
 			if (xs.exists(x =>{live.contains(x)})) {
 				LetTuple(xts, y, edash)
@@ -47,4 +47,5 @@ object Elim extends KNormal {
 			}
 		case e => e
 	}
+	def f(e:KNormal.T):KNormal.T = g(e.asInstanceOf[T]).asInstanceOf[KNormal.T]
 }

@@ -64,7 +64,7 @@ class X86Asm {
 	def fletd(x:Id.T, e1:Exp, e2:T):T = Let((x, Type.Float()), e1, e2)
 
 	val regs = // Array.init 16 (fun i => Printf.sprintf "%%r%d" i)
-	  Array( "%eax", "%ebx", "%ecx", "%edx", "%esi", /*, "%edi" */ )
+	  Array( "%eax", "%ebx", "%ecx", "%edx", "%esi" /*, "%edi" */ )
 
 	val fregs = Array("%f0", "%f2", "%f4", "%f6", "%f8", "%f10", "%f12", "%f14", "%f16",
     "%f18", "%f20", "%f22", "%f24", "%f26", "%f28", "%f30")
@@ -93,7 +93,7 @@ class X86Asm {
 	def remove_and_uniq (xs:List[Id.T], e:List[Id.T]):List[Id.T] = e match {
 		case List()                      => List()
 		case x :: ys if (xs.contains(x)) => remove_and_uniq(xs, ys)
-		case x :: ys                     => x :: remove_and_uniq(xs + x, ys)
+		case x :: ys                     => x :: remove_and_uniq(x::xs , ys)
 	}
 
 	// free variables in the order of use (for spilling) (caml2html: sparcasm_fv) 
@@ -151,3 +151,4 @@ class X86Asm {
 		case Forget(y, e1) => Forget(y, concat(e1, xt, e2))
 	}
 }
+object X86Asm extends X86Asm {}

@@ -65,5 +65,5 @@ val g :
 		case _ => throw new Exception();
 	}
 	
-	def f(e:T):T = g(new HashMap[Id.T, (List[(Id.T, Type.T)],T)], e:T)
+	def f(e:KNormal.T):KNormal.T = g(new HashMap[Id.T, (List[(Id.T, Type.T)],T)], e.asInstanceOf[T]).asInstanceOf[KNormal.T]
 }

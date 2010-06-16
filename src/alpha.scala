@@ -58,5 +58,5 @@ object Alpha extends KNormal{
 		case ExtFunApp(x, ys) => ExtFunApp(x, ys.map(y => find(y, env)) )
 	}
 
-	def f(e:T):T = g(new HashMap[Id.T,Id.T], e)
+	def f(e:KNormal.T):KNormal.T = g(new HashMap[Id.T,Id.T], e.asInstanceOf[T]).asInstanceOf[KNormal.T]
 }

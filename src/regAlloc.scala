@@ -256,14 +256,16 @@ object RegAlloc extends X86Asm {
 			
 			Fundef(x, arg_regs, farg_regs, edash, t)
 	}
-/*
+
 	// プログラム全体のレジスタ割り当て (caml2html: regalloc_f)
-	def f (e:Prog):Prog = e match {
+	def f1(e:Prog):Prog = e match {
 		case Prog(data, fundefs, e) =>
-			println("register allocation: may take some time (up to a few minutes, depending on the size of functions)@.");
+/*			println("register allocation: may take some time (up to a few minutes, depending on the size of functions)@.");
 			val fundefsdash = fundefs.map(h);
 			val (edash, regenvdash) = g((Id.gentmp(Type.Unit()), Type.Unit()), (Ans(Nop())), Map(), e);
-			Prog(data, fundefsdash, edash)
+			Prog(data, fundefsdash, edash)*/
+			null
 	}
-*/
+
+	def f(e:X86Asm.Prog):X86Asm.Prog = f1(e.asInstanceOf[Prog]).asInstanceOf[X86Asm.Prog]
 }

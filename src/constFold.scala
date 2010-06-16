@@ -92,5 +92,5 @@ object ConstFold extends KNormal {
 		case _ => throw new Exception();
 	}
 
-	def f(e:T):T = g(new HashMap[Id.T,T](), e)
+	def f(e:KNormal.T):KNormal.T = g(new HashMap[Id.T,T](), e.asInstanceOf[T]).asInstanceOf[KNormal.T]
 }

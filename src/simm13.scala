@@ -52,7 +52,9 @@ object Simm13 extends X86Asm {
 	}
 
 	// プログラム全体の13bit即値最適化
-	def f (e:Prog):Prog = e match {
+	def f1 (e:Prog):Prog = e match {
 		case Prog(data, fundefs, e) => Prog(data, fundefs.map(h) , g(Map[Id.T,Int](), e))
 	}
+	
+	def f(e:X86Asm.Prog):X86Asm.Prog = f1(e.asInstanceOf[Prog]).asInstanceOf[X86Asm.Prog]
 }

@@ -250,11 +250,13 @@ object Virtual extends X86Asm {
 
 	//val f : Closure.prog -> X86Asm.prog
 	// プログラム全体の仮想マシンコード生成 (caml2html: virtual_f)
-	def f(e1:Closure.Prog):Prog = e1 match {
+	def f1(e1:Closure.Prog):Prog = e1 match {
 		case Closure.Prog(fundefs:List[Closure.Fundef], e:Closure.T) =>
 			data = List();
 			val fundefs2 = fundefs.map(h);
 			val e2 = g(Map(), e)
 			Prog(data, fundefs2, e2)
 	}
+	
+	def f(e:Closure.Prog):X86Asm.Prog = f1(e).asInstanceOf[X86Asm.Prog]
 }
