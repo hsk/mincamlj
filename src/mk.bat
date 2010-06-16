@@ -19,5 +19,8 @@ call scalac elim.scala
 call scalac closure.scala
 call scalac x86Asm.scala
 call scalac virtual.scala
+call scalac simm13.scala
+call scalac regAlloc.scala
+call scalac emit.scala
 
 javac -classpath "C:\Program Files\Scala\lib\scala-library.jar;." test.java

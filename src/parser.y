@@ -22,7 +22,7 @@
 %token IF
 %token THEN
 %token ELSE
-%token <obj> IDENT
+%token <sval> IDENT
 %token LET
 %token IN
 %token REC
@@ -66,7 +66,7 @@ simple_exp /* äáå ÇÇ¬ÇØÇ»Ç≠ÇƒÇ‡ä÷êîÇÃà¯êîÇ…Ç»ÇÍÇÈéÆ (caml2html: parser_simple) 
     { $$ = new Int($1); }
 | FLOAT
     { $$ = new Syntax.Float($1); }
-| IDENT { $$ = new Var((Id.T)$1); }
+| IDENT { $$ = new Var((String)$1); }
 | simple_exp DOT LPAREN exp RPAREN
     { $$ = new Get((T)$1, (T)$4); }
 
@@ -118,7 +118,7 @@ exp /* àÍî ÇÃéÆ (caml2html: parser_exp) */
     { $$ = new FDiv((T)$1, (T)$3); }
 | LET IDENT EQUAL exp IN exp
     %prec prec_let
-    { $$ = let(addtyp((Id.T)$2), (T)$4, (T)$6); }
+    { $$ = let(addtyp((String)$2), (T)$4, (T)$6); }
 | LET REC fundef IN exp
     %prec prec_let
     { $$ = new LetRec((Fundef)$3, (T)$5); }
@@ -128,7 +128,7 @@ exp /* àÍî ÇÃéÆ (caml2html: parser_exp) */
 | elems
     { $$ = tuple(list((T)$1)); }
 | LET LPAREN pat RPAREN EQUAL exp IN exp
-    { $$ = letTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)$3, (T)$6, (T)$8); }
+    { $$ = letTuple((scala.List<scala.Tuple2<String,Type.T>>)$3, (T)$6, (T)$8); }
 | simple_exp DOT LPAREN exp RPAREN LESS_MINUS exp
     { $$ = new Put((T)$1, (T)$4, (T)$7); }
 | exp SEMICOLON exp
@@ -145,13 +145,13 @@ exp /* àÍî ÇÃéÆ (caml2html: parser_exp) */
 
 fundef
 : IDENT formal_args EQUAL exp
-    { $$ = fundef(addtyp((Id.T)$1), (scala.List<scala.Tuple2<Id.T,Type.T>>)$2, (T)$4); }
+    { $$ = fundef(addtyp((String)$1), (scala.List<scala.Tuple2<String,Type.T>>)$2, (T)$4); }
 
 formal_args
 : IDENT formal_args
-    { $$ = addList2(addtyp((Id.T)$1),(scala.List<scala.Tuple2<Id.T,Type.T>>)$2); }
+    { $$ = addList2(addtyp((String)$1),(scala.List<scala.Tuple2<String,Type.T>>)$2); }
 | IDENT
-    { $$ = list2(addtyp((Id.T)$1)); }
+    { $$ = list2(addtyp((String)$1)); }
 
 actual_args
 : actual_args simple_exp
@@ -169,9 +169,9 @@ elems
 
 pat
 : pat COMMA IDENT
-    { $$ = concatList2((scala.List<scala.Tuple2<Id.T,Type.T>>)$1, list2(addtyp((Id.T)$3))); }
+    { $$ = concatList2((scala.List<scala.Tuple2<String,Type.T>>)$1, list2(addtyp((String)$3))); }
 | IDENT COMMA IDENT
-    { $$ = addList2(addtyp((Id.T)$1),list2(addtyp((Id.T)$3))); }
+    { $$ = addList2(addtyp((String)$1),list2(addtyp((String)$3))); }
 
 %%
   public Yylex lexer;

@@ -789,7 +789,7 @@ case 5:
 break;
 case 6:
 //#line 69 "parser.y"
-{ yyval.obj = new Var((Id.T)val_peek(0).obj); }
+{ yyval.obj = new Var((String)val_peek(0).sval); }
 break;
 case 7:
 //#line 71 "parser.y"
@@ -872,7 +872,7 @@ case 24:
 break;
 case 25:
 //#line 121 "parser.y"
-{ yyval.obj = let(addtyp((Id.T)val_peek(4).obj), (T)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = let(addtyp((String)val_peek(4).sval), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 26:
 //#line 124 "parser.y"
@@ -888,7 +888,7 @@ case 28:
 break;
 case 29:
 //#line 131 "parser.y"
-{ yyval.obj = letTuple((scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = letTuple((scala.List<scala.Tuple2<String,Type.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 30:
 //#line 133 "parser.y"
@@ -904,15 +904,15 @@ case 32:
 break;
 case 33:
 //#line 148 "parser.y"
-{ yyval.obj = fundef(addtyp((Id.T)val_peek(3).obj), (scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
+{ yyval.obj = fundef(addtyp((String)val_peek(3).sval), (scala.List<scala.Tuple2<String,Type.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 34:
 //#line 152 "parser.y"
-{ yyval.obj = addList2(addtyp((Id.T)val_peek(1).obj),(scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(0).obj); }
+{ yyval.obj = addList2(addtyp((String)val_peek(1).sval),(scala.List<scala.Tuple2<String,Type.T>>)val_peek(0).obj); }
 break;
 case 35:
 //#line 154 "parser.y"
-{ yyval.obj = list2(addtyp((Id.T)val_peek(0).obj)); }
+{ yyval.obj = list2(addtyp((String)val_peek(0).sval)); }
 break;
 case 36:
 //#line 159 "parser.y"
@@ -932,11 +932,11 @@ case 39:
 break;
 case 40:
 //#line 172 "parser.y"
-{ yyval.obj = concatList2((scala.List<scala.Tuple2<Id.T,Type.T>>)val_peek(2).obj, list2(addtyp((Id.T)val_peek(0).obj))); }
+{ yyval.obj = concatList2((scala.List<scala.Tuple2<String,Type.T>>)val_peek(2).obj, list2(addtyp((String)val_peek(0).sval))); }
 break;
 case 41:
 //#line 174 "parser.y"
-{ yyval.obj = addList2(addtyp((Id.T)val_peek(2).obj),list2(addtyp((Id.T)val_peek(0).obj))); }
+{ yyval.obj = addList2(addtyp((String)val_peek(2).sval),list2(addtyp((String)val_peek(0).sval))); }
 break;
 //#line 863 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########

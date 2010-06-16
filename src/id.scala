@@ -1,20 +1,22 @@
 package mincaml;
 
 object Id {
-	case class T(s:String) // 変数の名前
-	case class L(l:String) // トップレベル関数やグローバル配列のラベル
+	type T = String
+	type L = String
+//	case class T(s:String) // 変数の名前
+//	case class L(l:String) // トップレベル関数やグローバル配列のラベル
 
 
 	def pp_list(x:List[T]):String = x match {
 	case List() => ""
-	case List(x) => x.s
+	case List(x) => x
 	case x :: xs => x + " " + pp_list(xs)
 	}
 
 	var counter = 0
 	def genid(s:Id.T):Id.T = {
 		counter += 1
-		T(s.s + "." + counter)
+		s + "." + counter
 	}
 
 	def id_of_typ(x:Type.T):String = x match {
@@ -30,7 +32,7 @@ object Id {
 
 	def gentmp(tp:Type.T):T = {
 		counter += 1
-		var rc = T("T" + id_of_typ(tp) + counter)
+		var rc = "T" + id_of_typ(tp) + counter
 		println("gentmp rc="+rc);
 		return rc;
 	}

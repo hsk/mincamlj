@@ -98,7 +98,7 @@ let = let
 <<EOF>>
     { /*return Parser.EOF;*/ return YYEOF;}
 {lower} ({digit}|{lower}|{upper}|"_")* // 他の「予約語」より後でないといけない *)
-    { yyparser.yylval = new ParserVal(new Id.T(yytext())); return Parser.IDENT;  }
+    { yyparser.yylval = new ParserVal(""+yytext()); return Parser.IDENT;  }
 
 
 /*

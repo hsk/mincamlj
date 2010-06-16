@@ -86,11 +86,11 @@ object Virtual extends X86Asm {
 			val l = v match {
 				case Some((l,_)) => l
 				case None =>
-					val l = Id.L(Id.genid(Id.T("l")).s);
+					val l = Id.genid("l");
 					data = (l, d) :: data;
 					l
 			}
-			val x = Id.genid(Id.T("l"));
+			val x = Id.genid("l");
 			Let((x, Type.Int()), SETL(l), Ans(LdDF(x, C(0))))
 		case Closure.Neg(x) => Ans(Neg(x))
 		case Closure.Add(x, y) => Ans(Add(x, V(y)))
@@ -134,12 +134,12 @@ object Virtual extends X86Asm {
 			);
 			Let(
 				(x, t),
-				Mov(Id.T(reg_hp)),
+				Mov(reg_hp),
 				Let(
-					(Id.T(reg_hp), Type.Int()),
-					Add(Id.T(reg_hp), C(align(offset))),
+					(reg_hp, Type.Int()),
+					Add(reg_hp, C(align(offset))),
 					{
-						val z = Id.genid(Id.T("l"));
+						val z = Id.genid("l");
 						Let(
 							(z, Type.Int()),
 							SETL(l),
@@ -151,11 +151,11 @@ object Virtual extends X86Asm {
 		case Closure.AppCls(x, ys) =>
 			val (int1:List[Id.T], float1:List[Id.T]) = separate( ys.map{case y => (y, env(y))} );
 			Ans(CallCls(x, int1, float1))
-		case Closure.AppDir(Id.L(x), ys) =>
+		case Closure.AppDir(x, ys) =>
 			val (int1, float1) = separate( ys.map{case y => (y, env(y))} );
-			Ans(CallDir(Id.L(x), int1, float1))
+			Ans(CallDir(x, int1, float1))
 		case Closure.Tuple(xs) => // 組の生成 (caml2html: virtual_tuple)
-			val y = Id.genid(Id.T("t"));
+			val y = Id.genid("t");
 			val (offset, store) =
 				expand(
 					xs.map{case x => (x, env(x))},
@@ -165,10 +165,10 @@ object Virtual extends X86Asm {
 				);
 			Let(
 				(y, Type.Tuple(xs.map{case x => env(x)})),
-				Mov(Id.T(reg_hp)),
+				Mov(reg_hp),
 				Let(
-					(Id.T(reg_hp), Type.Int()),
-					Add(Id.T(reg_hp), C(align(offset))),
+					(reg_hp, Type.Int()),
+					Add(reg_hp, C(align(offset))),
 					store
 				)
 			)
@@ -195,7 +195,7 @@ object Virtual extends X86Asm {
 				);
 			load
 		case Closure.Get(x, y) => // 配列の読み出し (caml2html: virtual_get)
-			val offset = Id.genid(Id.T("o"));
+			val offset = Id.genid("o");
 			env(x) match {
 				case Type.Array(Type.Unit()) => Ans(Nop())
 				case Type.Array(Type.Float()) =>
@@ -207,7 +207,7 @@ object Virtual extends X86Asm {
 				case _ => throw new Exception();
 			}
 		case Closure.Put(x, y, z) =>
-			val offset = Id.genid(Id.T("o"));
+			val offset = Id.genid("o");
 			env(x) match {
 				case Type.Array(Type.Unit()) => Ans(Nop())
 				case Type.Array(Type.Float()) =>
@@ -218,7 +218,7 @@ object Virtual extends X86Asm {
 						Ans(St(z, x, V(offset))))
 				case _ => throw new Exception();
 			}
-		case Closure.ExtArray(Id.L(x)) => Ans(SETL(Id.L("min_caml_" + x)))
+		case Closure.ExtArray(x) => Ans(SETL("min_caml_" + x))
 	}
 
 
@@ -231,19 +231,19 @@ object Virtual extends X86Asm {
 			body:T)
 	*/
 	def h(e1:Closure.Fundef):Fundef = e1 match {
-		case Closure.Fundef((Id.L(x), t), yts:List[(Id.T, Type.T)], zts, e) =>
+		case Closure.Fundef((x, t), yts:List[(Id.T, Type.T)], zts, e) =>
 			val (int1:List[Id.T], float1:List[Id.T]) = separate(yts);
-			val m:Map[Id.T,Type.T] = ((Map() ++ zts) ++ yts)+(Id.T(x)->t);
+			val m:Map[Id.T,Type.T] = ((Map() ++ zts) ++ yts)+(x->t);
 			val (offset:Int, load1:T) =
 				expand(
 					zts,
 					(4, g(m, e)),
-					(z:Id.T, offset, load0:T)               => fletd(z, LdDF(Id.T(reg_cl), C(offset)), load0),
-					(z:Id.T, t:Type.T, offset:Int, load2:T) => Let((z, t), Ld(Id.T(reg_cl), C(offset)), load2)
+					(z:Id.T, offset, load0:T)               => fletd(z, LdDF(reg_cl, C(offset)), load0),
+					(z:Id.T, t:Type.T, offset:Int, load2:T) => Let((z, t), Ld(reg_cl, C(offset)), load2)
 				);
 
 			t match {
-				case Type.Fun(_, t2) => Fundef(Id.L(x), int1, float1, load1, t2)
+				case Type.Fun(_, t2) => Fundef(x, int1, float1, load1, t2)
 				case _ => throw new Exception()
 			}
 	}

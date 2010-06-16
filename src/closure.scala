@@ -101,26 +101,26 @@ object Closure {
 			
 			// ここで自由変数zの型を引くために引数envが必要
 			val zts = zs2.map(z => (z, envdash(z)) );
-			toplevel = Fundef((Id.L(x.s), t), yts, zts, e1dash2) :: toplevel; // トップレベル関数を追加
+			toplevel = Fundef((x, t), yts, zts, e1dash2) :: toplevel; // トップレベル関数を追加
 			val e2dash = g(envdash,knowndash2,e2);
 
 			// xが変数としてe2dashに出現するか
 			if (fv(e2dash).contains(x)) {
-				MakeCls((x, t), Closure(Id.L(x.s), zs2), e2dash) // 出現していたら削除しない
+				MakeCls((x, t), Closure(x, zs2), e2dash) // 出現していたら削除しない
 			} else {
 				println("eliminating closure(s) "+x+"@.");
 				e2dash
 			} // 出現しなければMakeClsを削除
 		case KNormal.App(x, ys) if (known(x)) => // 関数適用の場合 (caml2html: closure_app)
 			println("directly applying "+x+"@.");
-			AppDir(Id.L(x.s), ys)
+			AppDir(x, ys)
 		case KNormal.App(f, xs) => AppCls(f, xs)
 		case KNormal.Tuple(xs) => Tuple(xs)
 		case KNormal.LetTuple(xts, y, e) => LetTuple(xts, y, g(env ++ xts, known, e))
 		case KNormal.Get(x, y) => Get(x, y)
 		case KNormal.Put(x, y, z) => Put(x, y, z)
-		case KNormal.ExtArray(x) => ExtArray(Id.L(x.s))
-		case KNormal.ExtFunApp(x, ys) => AppDir(Id.L("min_caml_" + x), ys)
+		case KNormal.ExtArray(x) => ExtArray(x)
+		case KNormal.ExtFunApp(x, ys) => AppDir("min_caml_" + x, ys)
 	}
 
 	def f(e:KNormal.T):Prog = {

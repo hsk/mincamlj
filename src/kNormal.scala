@@ -249,7 +249,7 @@ object KNormal extends KNormal {
 							case Type.Float() => "create_float_array"
 							case _         => "create_array"
 							}
-							(ExtFunApp(Id.T(l), List(x, y)), Type.Array(t2))
+							(ExtFunApp(l, List(x, y)), Type.Array(t2))
 						}
 					)
 				}
