@@ -1,45 +1,45 @@
 package mincaml;
 import scala.collection.immutable._;
 
-
 object ConstFold extends KNormal {
-	def memi(x:Id.T, env:Map[Id.T,T]):Boolean = try {
+
+	def memi(x:Id.T, env:Map[Id.T, T]):Boolean = try {
 		env(x) match {
 			case Int(_) => true
-			case _ => false
+			case _      => false
 		}
 	} catch {
 		case _ => false
 	}
 
-	def memf(x:Id.T, env:Map[Id.T,T]):Boolean = try {
+	def memf(x:Id.T, env:Map[Id.T, T]):Boolean = try {
 		env(x) match {
 			case Float(_) => true
-			case _ => false
+			case _        => false
 		}
 	} catch {
 		case _ => false
 	}
 
-	def memt(x:Id.T, env:Map[Id.T,T]):Boolean = try {
+	def memt(x:Id.T, env:Map[Id.T, T]):Boolean = try {
 		env(x) match {
 			case Tuple(_) => true
-			case _ => false
+			case _        => false
 		}
 	} catch {
 		case _ => false
 	}
 
-	def findi(x:Id.T, env:Map[Id.T,T]):scala.Int = env.get(x) match {
+	def findi(x:Id.T, env:Map[Id.T, T]):scala.Int = env.get(x) match {
 		case Some(Int(i)) => i
 		case _ => throw new Exception()
 	}
 
-	def findf(x:Id.T, env:Map[Id.T,T]):scala.Double = env.get(x) match {
+	def findf(x:Id.T, env:Map[Id.T, T]):scala.Double = env.get(x) match {
 		case Some(Float(d)) => d 
 		case _ => throw new Exception()
 	}
-	def findt(x:Id.T, env:Map[Id.T,T]):List[Id.T] = env.get(x) match {
+	def findt(x:Id.T, env:Map[Id.T, T]):List[Id.T] = env.get(x) match {
 		case Some(Tuple(ys)) => ys
 		case _ => throw new Exception()
 	}
@@ -81,10 +81,10 @@ object ConstFold extends KNormal {
 
 	def foldLeft2(
 		env:T,
-		zs:List[(Id.T,Type.T)],
+		zs:List[(Id.T, Type.T)],
 		ys:List[Id.T],
-		f1:(T,(Id.T,Type.T),Id.T)=>T
-	):T = (zs,ys) match {
+		f1:(T, (Id.T, Type.T), Id.T) => T
+	):T = (zs, ys) match {
 		case (z::List(), y::List()) => f1(env, z, y)
 		case (z::zs, y::ys) =>
 			val env2:T = f1(env, z, y);
@@ -92,5 +92,5 @@ object ConstFold extends KNormal {
 		case _ => throw new Exception();
 	}
 
-	def f(e:KNormal.T):KNormal.T = g(new HashMap[Id.T,T](), e.asInstanceOf[T]).asInstanceOf[KNormal.T]
+	def f(e:KNormal.T):KNormal.T = g(Map[Id.T, T](), e.asInstanceOf[T]).asInstanceOf[KNormal.T]
 }

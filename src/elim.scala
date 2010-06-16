@@ -10,7 +10,7 @@ object Elim extends KNormal {
 		case IfLE(_, _, e1, e2) => effect(e1) || effect(e2)
 		case LetRec(_, e)       => effect(e)
 		case LetTuple(_, _, e)  => effect(e)
-		case App(_,_) | Put(_,_,_) | ExtFunApp(_,_) => true
+		case App(_, _) | Put(_, _, _) | ExtFunApp(_, _) => true
 		case _ => false
 	}
 
@@ -19,30 +19,30 @@ object Elim extends KNormal {
 		case IfEq(x, y, e1, e2) => IfEq(x, y, g(e1), g(e2))
 		case IfLE(x, y, e1, e2) => IfLE(x, y, g(e1), g(e2))
 		case Let((x, t), e1, e2) => // letの場合 (caml2html: elim_let)
-			val e1dash = g(e1);
-			val e2dash = g(e2);
-			if (effect(e1dash) || fv(e2dash).contains(x) ) {
+			val e1dash = g(e1)
+			val e2dash = g(e2)
+			if (effect(e1dash) || fv(e2dash).contains(x)) {
 				Let((x, t), e1dash, e2dash)
 			} else {
-				println("eliminating variable "+x+"@.") ;
+				println("eliminating variable "+x+"@.")
 				e2dash
 			}
-		case LetRec(Fundef((x, t),yts,e1), e2) => // let recの場合 (caml2html: elim_letrec)
+		case LetRec(Fundef((x, t), yts, e1), e2) => // let recの場合 (caml2html: elim_letrec)
 			val e2dash = g(e2);
 			if (fv(e2dash).contains(x)) {
 				LetRec(Fundef((x, t), yts, g(e1)), e2dash)
 			} else {
-				println("eliminating function "+x+"@.");
+				println("eliminating function "+x+"@.")
 				e2dash
 			}
 		case LetTuple(xts, y, e) =>
-			val xs = xts.map{case(a,_)=>a};
-			val edash = g(e);
-			val live = fv(edash);
-			if (xs.exists(x =>{live.contains(x)})) {
+			val xs = xts.map{ _._1 }
+			val edash = g(e)
+			val live = fv(edash)
+			if (xs.exists{ live.contains(_) }) {
 				LetTuple(xts, y, edash)
 			} else {
-				println("eliminating variables "+Id.pp_list(xs)+"@.");
+				println("eliminating variables "+Id.pp_list(xs)+"@.")
 				edash
 			}
 		case e => e
