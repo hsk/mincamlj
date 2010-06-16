@@ -6,7 +6,7 @@ object RegAlloc extends X86Asm {
 	
 	// allocate a register or fail
 	// val alloc : X86Asm.t -> S.elt M.t -> M.key -> Type.t -> M.key = <fun>
-/*	def alloc(cont:T, regenv:Map[Id.T,Selt], x:Id.T, t:Type.T):Id.T = {
+	def alloc(cont:T, regenv:Map[Id.T,Selt], x:Id.T, t:Type.T):Id.T = {
 		if (!regenv.contains(x)) throw new Exception();
 		val all = t match {
 			case Type.Unit()  => List("%g0") // dummy
@@ -20,16 +20,16 @@ object RegAlloc extends X86Asm {
 		if (is_reg(x)) {
 			x
 		} else {
-			val free = fv(cont);
+			val free:List[Id.T] = fv(cont);
 			try {
 				val live = // 生きているレジスタ
-					free.foldLeft(Set()){
+					free.foldLeft(List[Id.T]()){
 					case (live, y) =>
 						if (is_reg(y)) {
-							live + y
+							y :: live
 						} else {
 							try {
-								live + regenv(y)
+								regenv(y) :: live
 							} catch {
 							case _ => live
 							}
@@ -38,7 +38,10 @@ object RegAlloc extends X86Asm {
 				val r = // そうでないレジスタを探す
 					all.find{case r => !live.contains(r)};
 				// println("allocated " + x + " to " + r + "@.");
-				r
+				r match {
+				case Some(r) => r
+				case None => throw new Exception()
+				}
 			} catch {
 			case _ => throw new Exception("register allocation failed for " + x)
 			}
@@ -55,7 +58,7 @@ object RegAlloc extends X86Asm {
 			regenv + (x -> r)
 		}
 	}
-*/
+
 	// auxiliary functions for gdash
 	case class NoReg(a:Id.T, b:Type.T) extends Exception;
 	// val find : Id.t -> Type.t -> Id.t M.t -> Id.t = <fun>
@@ -70,28 +73,25 @@ object RegAlloc extends X86Asm {
 			}
 		}
 	}
-/*	
+
 	// val find' : X86Asm.id_or_imm -> Id.t M.t -> X86Asm.id_or_imm
 	def finddash(xdash:id_or_imm, regenv:Map[Id.T,Id.T]):id_or_imm = xdash match {
-		case V(x) => V(regenv((x, Type.Int())))
+		case V(x) => V(find(x, Type.Int(), regenv) )
 		case c => c
 	}
-*/
+
 	// Id.t * Type.t -> X86Asm.t -> Id.t M.t -> X86Asm.t -> X86Asm.t * S.elt M.t
 	// 命令列のレジスタ割り当て (caml2html: regalloc_g)
 	def g(dest:(Id.T, Type.T), cont:T, regenv:Map[Id.T, Id.T], e:T):(T,Map[Id.T,Selt]) = e match {
 		case Ans(exp) => gdash_and_restore(dest, cont, regenv, exp);
-		case _ => throw new Exception();
-/*
 		case Let(xt@(x, t), exp, e) =>
 			if(regenv.contains(x))throw new Exception();
 			val contdash = concat(e, dest, cont);
 			val (e1dash, regenv1) = gdash_and_restore(xt, contdash, regenv, exp);
 			val r = alloc(contdash, regenv1, x, t);
 			val (e2dash, regenv2) = g(dest, cont, add(x, r, regenv1), e);
-			concat(e1dash, (r, t), (e2dash, regenv2))
+			(concat(e1dash, (r, t), e2dash), regenv2)
 		case Forget(x, e) => throw new Exception()
-*/		
 	}
 	// val g'_and_restore :
 	//  Id.t * Type.t -> X86Asm.t -> Id.t M.t -> X86Asm.exp -> X86Asm.t * S.elt M.t
@@ -111,7 +111,6 @@ object RegAlloc extends X86Asm {
 	def gdash(dest:(Id.T,Type.T), cont:T, regenv:Map[Id.T, Id.T], e:Exp):(T,Map[Id.T, Selt]) = e match {
 		case Nop() | SET(_) | SETL(_) | Comment(_) | Restore(_) => (Ans(e), regenv)
 		case Mov(x) => (Ans(Mov(find(x, Type.Int(), regenv))), regenv)
-		case _ => (Ans(e), regenv)/*
 		case Neg(x) => (Ans(Neg(find(x, Type.Int(), regenv))), regenv)
 		case Add(x, ydash) => (Ans(Add(find(x, Type.Int(), regenv), finddash(ydash, regenv))), regenv)
 		case Sub(x, ydash) => (Ans(Sub(find(x, Type.Int(), regenv), finddash(ydash, regenv))), regenv)
@@ -133,10 +132,8 @@ object RegAlloc extends X86Asm {
 		case exp@IfFLE(x, y, e1, e2)    => gdash_if(dest, cont, regenv, exp, (e1dash, e2dash) => IfFLE(find(x, Type.Float(), regenv), find(y, Type.Float(), regenv), e1dash, e2dash), e1, e2)
 		case exp@CallCls(x, ys, zs)   => gdash_call(dest, cont, regenv, exp, (ys, zs) => CallCls(find(x, Type.Int(), regenv), ys, zs), ys, zs)
 		case exp@CallDir(l, ys, zs)   => gdash_call(dest, cont, regenv, exp, (ys, zs) => CallDir(l, ys, zs), ys, zs)
-		case Save(x, y) => assert(false)
-*/
+		case Save(x, y) => throw new Exception()
 	}
-/*
 
 	//  Id.t * Type.t ->
 	//  X86Asm.t ->
@@ -152,45 +149,41 @@ object RegAlloc extends X86Asm {
 		regenv:Map[Id.T,Selt],
 		exp:Exp,
 		constr:(T,T)=>Exp,
-		e1:T, e2:T):(T, Set[Type]) = {
+		e1:T, e2:T):(T, Map[Id.T,Selt]) = {
 		val (e1dash, regenv1) = g(dest, cont, regenv, e1);
 		val (e2dash, regenv2) = g(dest, cont, regenv, e2);
 		
 		// 両方に共通のレジスタ変数だけ利用
-		val regenvdash = List.fold_left(
-			(regenvdash, x) => {
+		val regenvdash = fv(cont).foldLeft(Map[Id.T, Selt]()){
+			case (regenvdash, x) => 
 				try {
 					if (is_reg(x)) {
 						regenvdash
 					} else {
-						val r1 = M.find(x, regenv1);
-						val r2 = M.find(x, regenv2);
+						val r1 = regenv1(x);
+						val r2 = regenv2(x);
 						if (r1 != r2) {
 							regenvdash
 						} else {
-							M.add(x, r1, regenvdash)
+							regenvdash + (x -> r1)
 						}
 					}
 				} catch {
-				case Not_found => regenvdash
+				case _ => regenvdash
 				}
-			}
-			Map(),
-			fv(cont)
-		);
+			};
 		
-		List.fold_left(
-			(e, x) => {
-				if (x == fst(dest) || not(M.mem(x, regenv)) || M.mem(x, regenvdash)) {
-					e
-				} else {
-					 seq(Save(regenv(x), x), e)
-				}
-			}, // そうでない変数は分岐直前にセーブ
-			Ans(constr(e1dash, e2dash)),
-			fv(cont),
+		(
+			fv(cont).foldLeft(Ans(constr(e1dash, e2dash)).asInstanceOf[T]) {
+				case (e, x) =>
+					if (x == (dest match {case(a,_)=>a}) || !regenv.contains(x) || regenvdash.contains(x)) {
+						e
+					} else {
+						 seq(Save(regenv(x), x), e)
+					}
+				}, // そうでない変数は分岐直前にセーブ
 			regenvdash
-		 )
+		)
 	}
 
 	//  Id.t * Type.t ->
@@ -209,23 +202,23 @@ object RegAlloc extends X86Asm {
 		ys:List[Id.T],
 		zs:List[Id.T]
 	):(T,Map[Id.T,Selt]) = {
-		List.fold_left(
-			(e, x) => {
-				if (x == fst(dest) || not(M.mem(x, regenv))) {
-					e
-				} else {
-					seq(Save(regenv(x), x), e)
-				}
+		(
+			fv(cont).foldLeft(
+				Ans(constr(
+					ys.map{case y => find(y, Type.Int(),   regenv)},
+					zs.map{case z => find(z, Type.Float(), regenv)}
+				)).asInstanceOf[T]
+			) {
+				case (e, x) =>
+					if (x == (dest match {case (a,_)=>a}) || !regenv.contains(x)) {
+						e
+					} else {
+						seq(Save(regenv(x), x), e)
+					}
 			},
-			Ans(constr(
-				ys.map{case y => find(y, Type.Int(),   regenv)},
-				zs.map{case z => find(z, Type.Float(), regenv)}
-			)),
-			fv(cont),
-			M.empty()
+			Map[Id.T,Selt]()
 		)
 	}
-*/
 
 	// X86Asm.fundef -> X86Asm.fundef
 	// 関数のレジスタ割り当て (caml2html: regalloc_h)
@@ -260,11 +253,10 @@ object RegAlloc extends X86Asm {
 	// プログラム全体のレジスタ割り当て (caml2html: regalloc_f)
 	def f1(e:Prog):Prog = e match {
 		case Prog(data, fundefs, e) =>
-/*			println("register allocation: may take some time (up to a few minutes, depending on the size of functions)@.");
+			println("register allocation: may take some time (up to a few minutes, depending on the size of functions)@.");
 			val fundefsdash = fundefs.map(h);
 			val (edash, regenvdash) = g((Id.gentmp(Type.Unit()), Type.Unit()), (Ans(Nop())), Map(), e);
-			Prog(data, fundefsdash, edash)*/
-			null
+			Prog(data, fundefsdash, edash)
 	}
 
 	def f(e:X86Asm.Prog):X86Asm.Prog = f1(e.asInstanceOf[Prog]).asInstanceOf[X86Asm.Prog]
