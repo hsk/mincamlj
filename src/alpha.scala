@@ -5,6 +5,7 @@ import scala.collection.immutable.HashMap;
 
 object Alpha extends KNormal {
 
+	// 外部変数は変換しない
 	def find(x:Id.T, env:Map[Id.T, Id.T]):Id.T = try {
 		env(x)
 	} catch {
@@ -27,16 +28,20 @@ object Alpha extends KNormal {
 		case IfEq(x, y, e1, e2) => IfEq(find(x, env), find(y, env), g(env, e1), g(env, e2))
 		case IfLE(x, y, e1, e2) => IfLE(find(x, env), find(y, env), g(env, e1), g(env, e2))
 		case Let((x, t), e1, e2) => // letのα変換 (caml2html: alpha_let)
-			val xdash = Id.genid(x);
+			val xdash = Id.genid(x);// 新しい名前を作成
 			Let((xdash, t), g(env, e1), g(env + (x -> xdash), e2))
 		case Var(x) => Var(find(x, env))
 		case LetRec(Fundef((x, t), yts, e1), e2) => // let recのα変換 (caml2html: alpha_letrec)
-			val env2 = env + (x -> Id.genid(x));
+			// 関数名
+			val env2 = env + (x -> Id.genid(x));// 新しい名前作成
+			// 引数部
 			val envdash = yts.foldLeft(env2){ case (e, (k, _)) => e + (k -> Id.genid(k)) }
 			LetRec(
 				Fundef(
 					(find(x, env), t),
+					// 生成した名前適応
 					yts.map{ case (y, t) => (find(y, envdash), t) },
+					// body部
 					g(envdash, e1)
 				),
 				g(env, e2)

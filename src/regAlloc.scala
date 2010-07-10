@@ -7,7 +7,10 @@ object RegAlloc extends X86Asm {
 	// allocate a register or fail
 	// val alloc : X86Asm.t -> S.elt M.t -> M.key -> Type.t -> M.key = <fun>
 	def alloc(cont:T, regenv:Map[Id.T,Selt], x:Id.T, t:Type.T):Id.T = {
-		if (!regenv.contains(x)) throw new Exception();
+		if (regenv.contains(x)) {
+			System.out.println("regenv="+regenv);
+			throw new Exception();
+		}
 		val all = t match {
 			case Type.Unit()  => List("%g0") // dummy
 			case Type.Float() => allfregs
@@ -87,7 +90,9 @@ object RegAlloc extends X86Asm {
 		case Let(xt@(x, t), exp, e) =>
 			if(regenv.contains(x))throw new Exception();
 			val contdash = concat(e, dest, cont);
+			println("contdash="+contdash);
 			val (e1dash, regenv1) = gdash_and_restore(xt, contdash, regenv, exp);
+			println("call alloc "+contdash+" "+regenv1);
 			val r = alloc(contdash, regenv1, x, t);
 			val (e2dash, regenv2) = g(dest, cont, add(x, r, regenv1), e);
 			(concat(e1dash, (r, t), e2dash), regenv2)
@@ -98,10 +103,13 @@ object RegAlloc extends X86Asm {
 	// 使用される変数をスタックからレジスタへRestore (caml2html: regalloc_unspill)
 	def gdash_and_restore(dest:(Id.T, Type.T), cont:T, regenv:Map[Id.T, Id.T], exp:Exp):(T, Map[Id.T,Selt]) = {
 		try {
+			println("call gdash "+dest, cont, regenv, exp)
+			// regenvを検索
 			gdash(dest, cont, regenv, exp)
 		} catch {
 		case NoReg(x, t) =>
-			// println("restoring " + x + "@.")
+			// みつからない
+			println("restoring " + x + "@.")
 			g(dest, cont, regenv, Let((x, t), Restore(x), Ans(exp)))
 		}
 	}
@@ -254,7 +262,9 @@ object RegAlloc extends X86Asm {
 	def f1(e:Prog):Prog = e match {
 		case Prog(data, fundefs, e) =>
 			println("register allocation: may take some time (up to a few minutes, depending on the size of functions)@.");
+			println("fundefs=" + fundefs);
 			val fundefsdash = fundefs.map(h);
+			println("fundef ok");
 			val (edash, regenvdash) = g((Id.gentmp(Type.Unit()), Type.Unit()), (Ans(Nop())), Map(), e);
 			Prog(data, fundefsdash, edash)
 	}
