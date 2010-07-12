@@ -352,7 +352,7 @@ object Emit_x86 extends X86Asm {
 	def f(oc:out_channel, p:X86Asm.Prog):Unit = p.asInstanceOf[Prog] match {
 		case Prog(data, fundefs, e) =>
 			println("generating assembly...@.");
-			oc.println(".section\t\".rodata\"");
+			oc.println(".section\t.rodata");
 			oc.println(".align\t8");
 			data.foreach {
 				case (x, d) =>
@@ -360,12 +360,12 @@ object Emit_x86 extends X86Asm {
 					oc.println("\t.long\t0x"+gethi(d));
 					oc.println("\t.long\t0x"+getlo(d))
 			}
-			oc.println(".section\t\".text\"");
+			oc.println(".section\t.text");
 			fundefs.foreach {
 				case fundef => h(oc, fundef)
 			}
-			oc.println(".global\tmin_caml_start");
-			oc.println("min_caml_start:");
+			oc.println(".global\t_min_caml_start");
+			oc.println("_min_caml_start:");
 			oc.println("\tpushl\t%ebp");
 			oc.println("\tmovl\t%esp, %ebp");
 			oc.println("\tsubl\t$0x20, %esp");

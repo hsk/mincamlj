@@ -54,10 +54,40 @@ object Main {
 			lexbuf(new PrintWriter(new BufferedWriter(outchan)), inchan);
 			inchan.close();
 			outchan.close();
+			gcc(f + ".s");
 		} catch {
 			case e => inchan.close(); outchan.close(); throw e;
 		}
 	}
+	def gcc(file:String) {
+ try {
+    var rt = Runtime.getRuntime();
+    var p = rt.exec("gcc "+file+" libmincaml_x86.s stub.c");
+    var br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    var result:String = "";
+      while (result != null) {
+		result = br.readLine();
+		if(result != null) {
+			System.out.println(result);
+		}
+      }
+    br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+    result = "";
+      while (result != null) {
+		result = br.readLine();
+		if(result != null) {
+			System.out.println(result);
+		}
+      }
+
+      p.waitFor();
+  } catch {
+  case ex:IOException =>
+    ex.printStackTrace();
+  }	
+	
+	}
+
 	// ここからコンパイラの実行が開始される (caml2html: main_entry)
 	def main(argv:Array[String]):Unit = {
 
