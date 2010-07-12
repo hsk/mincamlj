@@ -55,7 +55,7 @@ object RegAlloc extends X86Asm {
 	// val add : Id.t -> Id.t -> Id.t M.t -> Id.t M.t =
 	def add(x:Id.T, r:Id.T, regenv:Map[Id.T,Id.T]):Map[Id.T,Id.T] = {
 		if (is_reg(x)) {
-			if (x == r) throw new Exception();
+			if (x != r) throw new Exception("x == r x="+x+" r="+r);
 			regenv
 		} else {
 			regenv + (x -> r)

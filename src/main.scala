@@ -54,15 +54,15 @@ object Main {
 			lexbuf(new PrintWriter(new BufferedWriter(outchan)), inchan);
 			inchan.close();
 			outchan.close();
-			gcc(f + ".s");
+			gcc(f + ".s", f);
 		} catch {
 			case e => inchan.close(); outchan.close(); throw e;
 		}
 	}
-	def gcc(file:String) {
+	def gcc(file:String, out:String) {
  try {
     var rt = Runtime.getRuntime();
-    var p = rt.exec("gcc "+file+" libmincaml_x86.s stub.c");
+    var p = rt.exec("gcc -o "+out+" "+file+" libmincaml_x86.s stub.c");
     var br = new BufferedReader(new InputStreamReader(p.getInputStream()));
     var result:String = "";
       while (result != null) {
