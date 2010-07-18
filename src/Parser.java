@@ -884,7 +884,7 @@ case 27:
 break;
 case 28:
 //#line 129 "parser.y"
-{ yyval.obj = tuple(list((T)val_peek(0).obj)); }
+{ System.out.println(val_peek(0).obj); yyval.obj = tuple((scala.List<T>)val_peek(0).obj); }
 break;
 case 29:
 //#line 131 "parser.y"

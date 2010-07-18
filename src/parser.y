@@ -126,7 +126,7 @@ exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
     %prec prec_app
     { $$ = app((T)$1, (scala.List<T>)$2); }
 | elems
-    { $$ = tuple(list((T)$1)); }
+    { System.out.println($1); $$ = tuple((scala.List<T>)$1); }
 | LET LPAREN pat RPAREN EQUAL exp IN exp
     { $$ = letTuple((scala.List<scala.Tuple2<String,Type.T>>)$3, (T)$6, (T)$8); }
 | simple_exp DOT LPAREN exp RPAREN LESS_MINUS exp
