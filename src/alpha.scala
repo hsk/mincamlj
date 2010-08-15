@@ -5,14 +5,20 @@ import scala.collection.immutable.HashMap;
 
 object Alpha extends KNormal {
 
-	// 外部変数は変換しない
-	def find(x:Id.T, env:Map[Id.T, Id.T]):Id.T = try {
-		env(x)
-	} catch {
-		case _ => x
+	/**
+	 * 外部変数は変換しない
+	 */
+	def find(x:Id.T, env:Map[Id.T, Id.T]):Id.T = {
+		try {
+			env(x)
+		} catch {
+			case _ => x
+		}
 	}
 
-	// α変換ルーチン本体 (caml2html: alpha_g)
+	/**
+	 * α変換ルーチン本体 (caml2html: alpha_g)
+	 */
 	def g(env:Map[Id.T, Id.T], e:T):T = e match {
 		case Unit() => Unit()
 		case Int(i) => Int(i)
@@ -61,5 +67,13 @@ object Alpha extends KNormal {
 		case ExtFunApp(x, ys) => ExtFunApp(x, ys.map{ find(_, env) } )
 	}
 
-	def f(e:KNormal.T):KNormal.T = g(Map[Id.T, Id.T](), e.asInstanceOf[T]).asInstanceOf[KNormal.T]
+	/**
+	 *
+	 */
+	def f(e: KNormal.T): KNormal.T = {
+		g(
+			Map[Id.T, Id.T](),
+			e.asInstanceOf[T]
+		).asInstanceOf[KNormal.T]
+	}
 }

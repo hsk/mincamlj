@@ -3,7 +3,10 @@ import java.io._;
 
 object Main {
 	var limit = 1000
-	// 最適化処理をくりかえす (caml2html: main_iter)
+
+	/**
+	 * 最適化処理をくりかえす
+	 */
 	def iter(n:Int, e:KNormal.T):KNormal.T = {
 		println("iteration n@.");
 		if (n == 0) {
@@ -18,7 +21,9 @@ object Main {
 		}
 	}
 
-	// バッファをコンパイルしてチャンネルへ出力する (caml2html: main_lexbuf)
+	/**
+	 * バッファをコンパイルしてチャンネルへ出力する
+	 */
 	def lexbuf(outchan:PrintWriter, inchan:FileReader):Unit = {
 
 		val yyparser = new Parser(inchan);
@@ -40,12 +45,10 @@ object Main {
 		Emit_x86.f(outchan, regialloc)
 		outchan.close();
 	}
-/*
-	// 文字列をコンパイルして標準出力に表示する (caml2html: main_string)
-//	def _string(s) = lexbuf(stdout, Lexing.from_string(s))
-*/
 
-	// ファイルをコンパイルしてファイルに出力する (caml2html: main_file)
+	/**
+	 * ファイルをコンパイルしてファイルに出力する
+	 */
 	def file(f:String):Unit = {
 		println("file="+f);
 		val inchan = new FileReader(f + ".ml") ;
@@ -59,36 +62,38 @@ object Main {
 			case e => inchan.close(); outchan.close(); throw e;
 		}
 	}
-	def gcc(file:String, out:String) {
- try {
-    var rt = Runtime.getRuntime();
-    var p = rt.exec("gcc -o "+out+" "+file+" libmincaml_x86.s stub.c");
-    var br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-    var result:String = "";
-      while (result != null) {
-		result = br.readLine();
-		if(result != null) {
-			System.out.println(result);
-		}
-      }
-    br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-    result = "";
-      while (result != null) {
-		result = br.readLine();
-		if(result != null) {
-			System.out.println(result);
-		}
-      }
 
-      p.waitFor();
-  } catch {
-  case ex:IOException =>
-    ex.printStackTrace();
-  }	
-	
+	def gcc(file:String, out:String) {
+		try {
+			var rt = Runtime.getRuntime();
+			var p = rt.exec("gcc -o "+out+" "+file+" libmincaml_x86.s stub.c");
+			var br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			var result:String = "";
+			while (result != null) {
+				result = br.readLine();
+				if(result != null) {
+					System.out.println(result);
+				}
+			}
+			br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			result = "";
+			while (result != null) {
+				result = br.readLine();
+				if(result != null) {
+					System.out.println(result);
+				}
+			}
+
+			p.waitFor();
+		} catch {
+			case ex:IOException =>
+			ex.printStackTrace();
+		}
 	}
 
-	// ここからコンパイラの実行が開始される (caml2html: main_entry)
+	/**
+	 * ここからコンパイラの実行が開始される
+	 */
 	def main(argv:Array[String]):Unit = {
 
 		def arg(n:Int,l:List[String]):List[String] = {
