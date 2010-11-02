@@ -1,3 +1,22 @@
+/*
+仮想マシンコード生成(virtual.ml)
+ 
+クロージャ変換が完了したら、いよいよSPARCアセンブリを生成します。しかし、いきなり本当のSPARCアセンブリを生成するのは大変なので、まずSPARCアセンブリに類似した、仮想マシンコードを生成します。どう「仮想」なのかというと、
+変数（レジスタ）が無限にある
+ブランチやジャンプのかわりにif-then-elseや関数呼び出しがある
+ 
+の2点が主です。
+ 
+このような仮想アセンブリを定義したのがsparcAsm.mlです。SparcAsm.expは、ほぼSPARCの命令に対応しています（if以外）。命令列SparcAsm.tは、関数の最後で値を返すAnsと、変数代入Letから成り立ちます。Forget, Save, Restoreについては後で述べます。
+ 
+クロージャ変換の結果を仮想マシンコードに変換する関数はVirtual.f, Virtual.h, Virtual.gの3つです。Virtual.fはプログラム全体（トップレベル関数のリストと、メインルーチンの式）を、Virtual.hは個々のトップレベル関数を、Virtual.gは式を変換します。変換の主要な部分は、クロージャや組・配列の生成や読み出し・書き込みにともなうメモリアクセスを明示することです。クロージャや組・配列などのデータ構造はヒープというメモリ領域に確保します。ヒープのアドレスは専用のレジスタSparcAsm.reg_hpで記憶することとします。
+ 
+たとえば、配列の読み出しClosure.Getだったら、要素のサイズに応じてオフセットをシフトし、ロードを行います。組の生成Closure.Tupleであれば、浮動小数のアラインメント（8バイト）に注意しつつ、個々の要素を順番にストアしていき、先頭のアドレスを組そのものの値とします。クロージャの生成Closure.MakeClsも、アラインメントに注意しつつ、関数本体のアドレス（ラベル）と自由変数の値をストアしていき、先頭のアドレスをクロージャそのものの値とします。これに対応して、トップレベル関数の冒頭では、クロージャから自由変数の値をロードします。ただし、クロージャによる関数呼び出し（AppCls）を行う際は、そのクロージャのアドレスを必ずレジスタSparcAsm.reg_clで与えることとします。
+ 
+なお、SPARCアセンブリでは浮動小数を即値として記述できないので、メモリに定数テーブルを作成する必要があります。そのためにVirtual.gでグローバル変数Virtual.dataに浮動小数定数を記録していき、Virtual.fでプログラム全体SparcAsm.Progの一部とします。
+ 
+*/
+
 package mincaml;
 
 // translation into SPARC assembly with infinite number of virtual registers
@@ -258,5 +277,5 @@ object Virtual extends X86Asm {
 			Prog(data, fundefs2, e2)
 	}
 	
-	def f(e:Closure.Prog):X86Asm.Prog = f1(e).asInstanceOf[X86Asm.Prog]
+	def apply(e:Closure.Prog):X86Asm.Prog = f1(e).asInstanceOf[X86Asm.Prog]
 }

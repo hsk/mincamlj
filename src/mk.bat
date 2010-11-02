@@ -8,7 +8,7 @@ copy /Y Parser.java mincaml\.
 copy /Y ParserVal.java mincaml\.
 
 javac -classpath "C:\Program Files\Scala\lib\scala-library.jar;." mincaml/Parser.java mincaml/ParserVal.java mincaml/YyLex.java
-call scala mincaml.Parser a.ml
+rem call scala mincaml.Parser a.ml
 call scalac kNormal.scala
 call scalac alpha.scala
 call scalac beta.scala
@@ -22,5 +22,6 @@ call scalac virtual.scala
 call scalac simm13.scala
 call scalac regAlloc.scala
 call scalac emit.scala
-
+call scalac emit_x86.scala
+call scalac main.scala
 javac -classpath "C:\Program Files\Scala\lib\scala-library.jar;." test.java

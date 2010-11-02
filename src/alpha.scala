@@ -1,12 +1,20 @@
 package mincaml;
 import scala.collection.immutable.HashMap;
 
-// rename identifiers to make them unique (alpha-conversion)
-
+/**
+ * α変換
+ *
+ * 異なる変数には異なる名前をつける
+ * rename identifiers to make them unique (alpha-conversion)
+ */
 object Alpha extends KNormal {
 
 	/**
 	 * 外部変数は変換しない
+	 *
+	 * 外部変数の名前はenvに登録されないので、α変換の対象になりません。
+	 * これは意図された動作です。
+	 * もし外部変数の名前が変わってしまったら正しくリンクできなくなるからです。
 	 */
 	def find(x:Id.T, env:Map[Id.T, Id.T]):Id.T = {
 		try {
@@ -17,7 +25,12 @@ object Alpha extends KNormal {
 	}
 
 	/**
-	 * α変換ルーチン本体 (caml2html: alpha_g)
+	 * α変換ルーチン本体
+	 *
+	 * 変換前の変数名から変換後の変数名への写像envと、変換前の式eとを受け取り、変換後の式を返します。
+	 * たとえばlet x = e1 in e2という式があったら、まずe1を変換してから、
+	 * 新しい変数x'を作り、xからx'への対応をenvに追加して、e2を変換するという具合です。
+	 * let recやLetTupleの場合も、一見するとややこしそうですが、やっていることは一緒です。
 	 */
 	def g(env:Map[Id.T, Id.T], e:T):T = e match {
 		case Unit() => Unit()
@@ -68,9 +81,18 @@ object Alpha extends KNormal {
 	}
 
 	/**
+	 * α変換エントリポイント
 	 *
+	 * さて、K正規化が済んだら最適化を行うのですが、その前に「異なる変数には異なる名前をつける」α変換を行います。
+	 * 違う変数に同じ名前がついていると、いろいろと処理が面倒になるためです。
+	 * たとえばlet x = 123 in let x = 456 in x + xという式だったら、
+	 * let x1 = 123 in let x2 = 456 in x2 + x2と直してしまいます。
+	 *
+	 * 環境を作ってgを呼び出します。
+	 * @param e: KNormal.T K正規化の式
+	 * @return KNormal.T α変換後のK正規化された式
 	 */
-	def f(e: KNormal.T): KNormal.T = {
+	def apply(e: KNormal.T): KNormal.T = {
 		g(
 			Map[Id.T, Id.T](),
 			e.asInstanceOf[T]

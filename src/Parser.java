@@ -18,8 +18,33 @@ package mincaml;
 
 
 //#line 2 "parser.y"
+/*
+構文解析(parser.mly)
+ 
+さて、字句解析が終わると
+「1」「2」「3」「-」「4」「5」「6」「+」「7」「8」「9」
+のような文字列のかわりに
+「123」「-」「456」「+」「789」
+のような字句の列が得られます。が、このように平らな列のままでは、まだ高度な処理はできません。たとえば「123-456+789」だったら123-(456+789)ではなく(123-456)+789という意味であることを認識しないといけないからです。syntax.mlで定義したデータ型Syntax.tで表現すると、
+Add(Sub(Int 123, Int 456), Int 789)
+のような構文木として解釈する必要があるわけです。このように字句の列を構文木に変換する処理を構文解析といいます。MinCamlコンパイラでは、ocamlyaccというツールを利用して、parser.mlyというファイルで構文解析を実装しています。
+ 
+parser.mlyの中身はlexer.mllと類似しており、字句の列から構文木を表すデータ型へのパターンマッチングが並んでいます。たとえば
+ 
+| exp PLUS exp
+    { Add($1, $3) }
+ 
+という感じです。$1や$3というのは、1番目や3番目の構文要素（ここでは両方ともexp）という意味です。
+ 
+構文の定義は、ほとんど先に述べた式eの通りなのですが、一点だけ注意があります。MLでは式を並べるだけで関数適用になるので、x - yと書いたときに、x からyを引き算しているのか、関数xを引数-yに適用しているのか、曖昧になってしまうのです！　そこで、括弧をつけなくても関数の引数になれる式simple_expと、一般の式expを区別しています。たとえば-yはsimple_expではないので、先の例は関数適用ではなく引き算であるとわかるわけです。
+ 
+また、いろいろな構文や二引数演算子の優先順位、（lexer.mllで出てきた）字句を表すデータ型もparser.mlyで定義されています。
+ 
+なお、変数の型が必要なところ（letなど）は、とりあえず未定義の新しい型変数Var(ref None)で埋めています。これについては次の型推論で述べます。
+ 
+*/
   import java.io.*;
-//#line 19 "Parser.java"
+//#line 44 "Parser.java"
 
 
 
@@ -585,7 +610,7 @@ final static String yyrule[] = {
 "pat : IDENT COMMA IDENT",
 };
 
-//#line 177 "parser.y"
+//#line 202 "parser.y"
   public Yylex lexer;
 
   public int yylex () {
@@ -611,9 +636,8 @@ final static String yyrule[] = {
     Parser yyparser = new Parser(new FileReader(args[0]));
     System.out.println(yyparser.yyparse());
     System.out.println(yyparser.yyval.obj);
-    System.out.println(Typing.f((Syntax.T)yyparser.yyval.obj));
   }
-//#line 543 "Parser.java"
+//#line 567 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -768,43 +792,43 @@ boolean doaction;
       {
 //########## USER-SUPPLIED ACTIONS ##########
 case 1:
-//#line 60 "parser.y"
+//#line 85 "parser.y"
 { yyval.obj = val_peek(1).obj; }
 break;
 case 2:
-//#line 62 "parser.y"
+//#line 87 "parser.y"
 { yyval.obj = new Unit(); }
 break;
 case 3:
-//#line 64 "parser.y"
+//#line 89 "parser.y"
 { yyval.obj = new Bool((Boolean)val_peek(0).obj); }
 break;
 case 4:
-//#line 66 "parser.y"
+//#line 91 "parser.y"
 { yyval.obj = new Int(val_peek(0).ival); }
 break;
 case 5:
-//#line 68 "parser.y"
+//#line 93 "parser.y"
 { yyval.obj = new Syntax.Float(val_peek(0).dval); }
 break;
 case 6:
-//#line 69 "parser.y"
+//#line 94 "parser.y"
 { yyval.obj = new Var((String)val_peek(0).sval); }
 break;
 case 7:
-//#line 71 "parser.y"
+//#line 96 "parser.y"
 { yyval.obj = new Get((T)val_peek(4).obj, (T)val_peek(1).obj); }
 break;
 case 8:
-//#line 75 "parser.y"
+//#line 100 "parser.y"
 { yyval.obj = val_peek(0).obj; }
 break;
 case 9:
-//#line 78 "parser.y"
+//#line 103 "parser.y"
 { yyval.obj = new Not((T)val_peek(0).obj); }
 break;
 case 10:
-//#line 81 "parser.y"
+//#line 106 "parser.y"
 {
         if (val_peek(0).obj instanceof Syntax.Float) {
             yyval.obj = new Syntax.Float(-((Syntax.Float)val_peek(0).obj).a());
@@ -815,130 +839,130 @@ case 10:
     }
 break;
 case 11:
-//#line 90 "parser.y"
+//#line 115 "parser.y"
 { yyval.obj = new Add((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 12:
-//#line 92 "parser.y"
+//#line 117 "parser.y"
 { yyval.obj = new Sub((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 13:
-//#line 94 "parser.y"
+//#line 119 "parser.y"
 { yyval.obj = new Eq((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 14:
-//#line 96 "parser.y"
+//#line 121 "parser.y"
 { yyval.obj = new Not(new Eq((T)val_peek(2).obj, (T)val_peek(0).obj)); }
 break;
 case 15:
-//#line 98 "parser.y"
+//#line 123 "parser.y"
 { yyval.obj = new Not(new LE((T)val_peek(0).obj, (T)val_peek(2).obj)); }
 break;
 case 16:
-//#line 100 "parser.y"
+//#line 125 "parser.y"
 { yyval.obj = new Not(new LE((T)val_peek(2).obj, (T)val_peek(0).obj)); }
 break;
 case 17:
-//#line 102 "parser.y"
+//#line 127 "parser.y"
 { yyval.obj = new LE((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 18:
-//#line 104 "parser.y"
+//#line 129 "parser.y"
 { yyval.obj = new LE((T)val_peek(0).obj, (T)val_peek(2).obj); }
 break;
 case 19:
-//#line 107 "parser.y"
+//#line 132 "parser.y"
 { yyval.obj = new If((T)val_peek(4).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 20:
-//#line 110 "parser.y"
+//#line 135 "parser.y"
 { yyval.obj = new FNeg((T)val_peek(0).obj); }
 break;
 case 21:
-//#line 112 "parser.y"
+//#line 137 "parser.y"
 { yyval.obj = new FAdd((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 22:
-//#line 114 "parser.y"
+//#line 139 "parser.y"
 { yyval.obj = new FSub((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 23:
-//#line 116 "parser.y"
+//#line 141 "parser.y"
 { yyval.obj = new FMul((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 24:
-//#line 118 "parser.y"
+//#line 143 "parser.y"
 { yyval.obj = new FDiv((T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 25:
-//#line 121 "parser.y"
+//#line 146 "parser.y"
 { yyval.obj = let(addtyp((String)val_peek(4).sval), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 26:
-//#line 124 "parser.y"
+//#line 149 "parser.y"
 { yyval.obj = new LetRec((Fundef)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 27:
-//#line 127 "parser.y"
+//#line 152 "parser.y"
 { yyval.obj = app((T)val_peek(1).obj, (scala.List<T>)val_peek(0).obj); }
 break;
 case 28:
-//#line 129 "parser.y"
+//#line 154 "parser.y"
 { System.out.println(val_peek(0).obj); yyval.obj = tuple((scala.List<T>)val_peek(0).obj); }
 break;
 case 29:
-//#line 131 "parser.y"
+//#line 156 "parser.y"
 { yyval.obj = letTuple((scala.List<scala.Tuple2<String,Type.T>>)val_peek(5).obj, (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 30:
-//#line 133 "parser.y"
+//#line 158 "parser.y"
 { yyval.obj = new Put((T)val_peek(6).obj, (T)val_peek(3).obj, (T)val_peek(0).obj); }
 break;
 case 31:
-//#line 135 "parser.y"
+//#line 160 "parser.y"
 { yyval.obj = let(tuple2(Id.gentmp(new Type.Unit()), new Type.Unit()), (T)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 32:
-//#line 138 "parser.y"
+//#line 163 "parser.y"
 { yyval.obj = new Array((T)val_peek(1).obj, (T)val_peek(0).obj); }
 break;
 case 33:
-//#line 148 "parser.y"
+//#line 173 "parser.y"
 { yyval.obj = fundef(addtyp((String)val_peek(3).sval), (scala.List<scala.Tuple2<String,Type.T>>)val_peek(2).obj, (T)val_peek(0).obj); }
 break;
 case 34:
-//#line 152 "parser.y"
+//#line 177 "parser.y"
 { yyval.obj = addList2(addtyp((String)val_peek(1).sval),(scala.List<scala.Tuple2<String,Type.T>>)val_peek(0).obj); }
 break;
 case 35:
-//#line 154 "parser.y"
+//#line 179 "parser.y"
 { yyval.obj = list2(addtyp((String)val_peek(0).sval)); }
 break;
 case 36:
-//#line 159 "parser.y"
+//#line 184 "parser.y"
 { yyval.obj = concatList((scala.List<T>)val_peek(1).obj, list((T)val_peek(0).obj)); }
 break;
 case 37:
-//#line 162 "parser.y"
+//#line 187 "parser.y"
 { yyval.obj = list((T)val_peek(0).obj); }
 break;
 case 38:
-//#line 166 "parser.y"
+//#line 191 "parser.y"
 { yyval.obj = concatList((scala.List<T>)val_peek(2).obj, list((T)val_peek(0).obj)); }
 break;
 case 39:
-//#line 168 "parser.y"
+//#line 193 "parser.y"
 { yyval.obj = addList((T)val_peek(2).obj,list((T)val_peek(0).obj)); }
 break;
 case 40:
-//#line 172 "parser.y"
+//#line 197 "parser.y"
 { yyval.obj = concatList2((scala.List<scala.Tuple2<String,Type.T>>)val_peek(2).obj, list2(addtyp((String)val_peek(0).sval))); }
 break;
 case 41:
-//#line 174 "parser.y"
+//#line 199 "parser.y"
 { yyval.obj = addList2(addtyp((String)val_peek(2).sval),list2(addtyp((String)val_peek(0).sval))); }
 break;
-//#line 863 "Parser.java"
+//#line 887 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

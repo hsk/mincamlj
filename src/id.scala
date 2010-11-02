@@ -1,11 +1,8 @@
 package mincaml;
 
 object Id {
-	type T = String
-	type L = String
-//	case class T(s:String) // 変数の名前
-//	case class L(l:String) // トップレベル関数やグローバル配列のラベル
-
+	type T = String// 変数の名前
+	type L = String// トップレベル関数やグローバル配列のラベル
 
 	def pp_list(x:List[T]):String = x match {
 	case List() => ""

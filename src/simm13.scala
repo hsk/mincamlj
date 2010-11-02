@@ -1,3 +1,9 @@
+/*
+13 bit即値最適化(simm13.ml)
+ 
+SPARCアセンブリでは、ほとんどの整数演算の第二オペランドとして、レジスタだけでなく13 bit以下（-4096以上4096未満）の整数即値をとることができます。そのための最適化処理をSimm13.gおよびSimm13.g'で実装しています。対象が仮想SPARCアセンブリであり、定数が13 bit整数に制限されていること以外は、定数畳み込みや不要定義削除とほぼ同様です。
+ 
+*/
 package mincaml;
 import scala.collection.immutable._;
 
@@ -56,5 +62,7 @@ object Simm13 extends X86Asm {
 		case Prog(data, fundefs, e) => Prog(data, fundefs.map(h) , g(Map[Id.T,Int](), e))
 	}
 	
-	def f(e:X86Asm.Prog):X86Asm.Prog = f1(e.asInstanceOf[Prog]).asInstanceOf[X86Asm.Prog]
+	def apply(e:X86Asm.Prog):X86Asm.Prog = {
+		f1(e.asInstanceOf[Prog]).asInstanceOf[X86Asm.Prog]
+	}
 }

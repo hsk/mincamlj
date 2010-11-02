@@ -1,16 +1,43 @@
 package mincaml;
 import scala.collection.immutable.HashMap;
+/*
+β簡約(beta.ml)
+ 
+ 
 
+*/
+/**
+ * β簡約
+ */
 object Beta extends KNormal {
 
-	// 置換のための関数 (caml2html: beta_find)
-	def find(x:Id.T, env:Map[Id.T, Id.T]):Id.T = try {
-		env(x)
-	} catch {
-		case _ => x
+	/**
+	 * 置換のための関数
+	 *
+     * K正規形では、ありとあらゆる式に変数が出てくるので置換する
+     * @param x:Id.T 変数
+     * @param env:Map[Id.T, Id.T] ある変数からそれに等しい変数への写像
+	 */
+	def find(x:Id.T, env:Map[Id.T, Id.T]):Id.T = {
+		try {
+			env(x)
+		} catch {
+			case _ => x
+		}
 	}
 
-	// β簡約ルーチン本体 (caml2html: beta_g)
+	/**
+	 * β簡約ルーチン本体
+	 *
+	 * ある変数からそれに等しい変数への写像envと、式eとを受け取り、eをβ簡約した式を返します。
+	 * やはりポイントはlet x = e1 in e2の場合で、e1をβ簡約した結果が変数yだったら、
+	 * xからyへの対応をenvに追加して、e2をβ簡約します。
+	 * そして、変数xが出てきたら、envを引いて、変数yに置き換えてしまいます。
+	 *
+	 * @param env:Map[Id.T, Id.T] ある変数からそれに等しい変数への写像
+	 * @param e:T 式
+	 * @return T β簡約した式
+	 */
 	def g(env:Map[Id.T, Id.T], e:T):T = e match {
 		case Unit() => Unit()
 		case Int(i) => Int(i)
@@ -46,5 +73,15 @@ object Beta extends KNormal {
 		case ExtFunApp(x, ys) => ExtFunApp(x, ys.map{ find(_, env) })
 	}
 
-	def f(e:KNormal.T):KNormal.T = g(Map[Id.T, Id.T](), e.asInstanceOf[Beta.T]).asInstanceOf[KNormal.T]
+	/**
+	 * 例)
+	 * let x = y in x + y ではxとyが等しいのでx + yをy + yと置き換える。
+	 *
+	 * このような変換をK正規形のβ簡約といいます
+	 *（λ計算という理論でもβ簡約という言葉がありますが、それの特殊な場合になっています）。
+	 * 普通のプログラムだと、あまり必要な処理でもないのですが、他の最適化等をした後のプログラムでは効果がある場合もあります。
+	 */
+	def apply(e:KNormal.T):KNormal.T = {
+		g(Map[Id.T, Id.T](), e.asInstanceOf[Beta.T]).asInstanceOf[KNormal.T]
+	}
 }

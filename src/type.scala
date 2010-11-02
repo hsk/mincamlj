@@ -10,5 +10,7 @@ object Type {
 	case class Array(a:T) extends T
 	case class Var(var a:Option[T]) extends T
 
-	def gentyp():T = Var(None) // 新しい型変数を作る
+	def gentyp():T = {
+		Var(None) // 新しい型変数を作る
+	}
 }
