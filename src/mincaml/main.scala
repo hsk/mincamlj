@@ -116,7 +116,7 @@ object Main {
   def optimize(n:Int, e:KNormal.T):KNormal.T = {
     if (n == 0) e else {
       val e1 = Elim(ConstFold(Inline(Assoc(Beta(e)))))
-      if (e == e1) e else optimize((n - 1), edash)
+      if (e == e1) e else optimize((n - 1), e1)
     }
   }
 

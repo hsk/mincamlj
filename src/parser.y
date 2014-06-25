@@ -1,33 +1,33 @@
 %{
 /*
-\•¶‰ðÍ(parser.mly)
+ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½(parser.mly)
  
-‚³‚ÄAŽš‹å‰ðÍ‚ªI‚í‚é‚Æ
-u1vu2vu3vu-vu4vu5vu6vu+vu7vu8vu9v
-‚Ì‚æ‚¤‚È•¶Žš—ñ‚Ì‚©‚í‚è‚É
-u123vu-vu456vu+vu789v
-‚Ì‚æ‚¤‚ÈŽš‹å‚Ì—ñ‚ª“¾‚ç‚ê‚Ü‚·B‚ªA‚±‚Ì‚æ‚¤‚É•½‚ç‚È—ñ‚Ì‚Ü‚Ü‚Å‚ÍA‚Ü‚¾‚“x‚Èˆ—‚Í‚Å‚«‚Ü‚¹‚ñB‚½‚Æ‚¦‚Îu123-456+789v‚¾‚Á‚½‚ç123-(456+789)‚Å‚Í‚È‚­(123-456)+789‚Æ‚¢‚¤ˆÓ–¡‚Å‚ ‚é‚±‚Æ‚ð”FŽ¯‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚©‚ç‚Å‚·Bsyntax.ml‚Å’è‹`‚µ‚½ƒf[ƒ^Œ^Syntax.t‚Å•\Œ»‚·‚é‚ÆA
+ï¿½ï¿½ï¿½ÄAï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½
+ï¿½u1ï¿½vï¿½u2ï¿½vï¿½u3ï¿½vï¿½u-ï¿½vï¿½u4ï¿½vï¿½u5ï¿½vï¿½u6ï¿½vï¿½u+ï¿½vï¿½u7ï¿½vï¿½u8ï¿½vï¿½u9ï¿½v
+ï¿½Ì‚æ‚¤ï¿½È•ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½u123ï¿½vï¿½u-ï¿½vï¿½u456ï¿½vï¿½u+ï¿½vï¿½u789ï¿½v
+ï¿½Ì‚æ‚¤ï¿½ÈŽï¿½ï¿½ï¿½Ì—ñ‚ª“ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Ì‚æ‚¤ï¿½É•ï¿½ï¿½ï¿½È—ï¿½Ì‚Ü‚Ü‚Å‚ÍAï¿½Ü‚ï¿½ï¿½ï¿½ï¿½xï¿½Èï¿½ï¿½ï¿½ï¿½Í‚Å‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½Æ‚ï¿½ï¿½Îu123-456+789ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½123-(456+789)ï¿½Å‚Í‚È‚ï¿½(123-456)+789ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½Ó–ï¿½ï¿½Å‚ï¿½ï¿½é‚±ï¿½Æ‚ï¿½Fï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½Bsyntax.mlï¿½Å’ï¿½`ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½^Syntax.tï¿½Å•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆA
 Add(Sub(Int 123, Int 456), Int 789)
-‚Ì‚æ‚¤‚È\•¶–Ø‚Æ‚µ‚Ä‰ðŽß‚·‚é•K—v‚ª‚ ‚é‚í‚¯‚Å‚·B‚±‚Ì‚æ‚¤‚ÉŽš‹å‚Ì—ñ‚ð\•¶–Ø‚É•ÏŠ·‚·‚éˆ—‚ð\•¶‰ðÍ‚Æ‚¢‚¢‚Ü‚·BMinCamlƒRƒ“ƒpƒCƒ‰‚Å‚ÍAocamlyacc‚Æ‚¢‚¤ƒc[ƒ‹‚ð—˜—p‚µ‚ÄAparser.mly‚Æ‚¢‚¤ƒtƒ@ƒCƒ‹‚Å\•¶‰ðÍ‚ðŽÀ‘•‚µ‚Ä‚¢‚Ü‚·B
+ï¿½Ì‚æ‚¤ï¿½È\ï¿½ï¿½ï¿½Ø‚Æ‚ï¿½ï¿½Ä‰ï¿½ï¿½ß‚ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½í‚¯ï¿½Å‚ï¿½ï¿½Bï¿½ï¿½ï¿½Ì‚æ‚¤ï¿½ÉŽï¿½ï¿½ï¿½Ì—ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½Ø‚É•ÏŠï¿½ï¿½ï¿½ï¿½éˆï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½Í‚Æ‚ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½BMinCamlï¿½Rï¿½ï¿½ï¿½pï¿½Cï¿½ï¿½ï¿½Å‚ÍAocamlyaccï¿½Æ‚ï¿½ï¿½ï¿½ï¿½cï¿½[ï¿½ï¿½ï¿½ð—˜—pï¿½ï¿½ï¿½ÄAparser.mlyï¿½Æ‚ï¿½ï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Å\ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
  
-parser.mly‚Ì’†g‚Ílexer.mll‚Æ—ÞŽ—‚µ‚Ä‚¨‚èAŽš‹å‚Ì—ñ‚©‚ç\•¶–Ø‚ð•\‚·ƒf[ƒ^Œ^‚Ö‚Ìƒpƒ^[ƒ“ƒ}ƒbƒ`ƒ“ƒO‚ª•À‚ñ‚Å‚¢‚Ü‚·B‚½‚Æ‚¦‚Î
+parser.mlyï¿½Ì’ï¿½ï¿½gï¿½ï¿½lexer.mllï¿½Æ—ÞŽï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½Ì—ñ‚©‚ï¿½\ï¿½ï¿½ï¿½Ø‚ï¿½\ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½^ï¿½Ö‚Ìƒpï¿½^ï¿½[ï¿½ï¿½ï¿½}ï¿½bï¿½`ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½
  
 | exp PLUS exp
     { Add($1, $3) }
  
-‚Æ‚¢‚¤Š´‚¶‚Å‚·B$1‚â$3‚Æ‚¢‚¤‚Ì‚ÍA1”Ô–Ú‚â3”Ô–Ú‚Ì\•¶—v‘fi‚±‚±‚Å‚Í—¼•û‚Æ‚àexpj‚Æ‚¢‚¤ˆÓ–¡‚Å‚·B
+ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½B$1ï¿½ï¿½$3ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½Ì‚ÍA1ï¿½Ô–Ú‚ï¿½3ï¿½Ô–Ú‚Ì\ï¿½ï¿½ï¿½vï¿½fï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Å‚Í—ï¿½ï¿½ï¿½Æ‚ï¿½expï¿½jï¿½Æ‚ï¿½ï¿½ï¿½ï¿½Ó–ï¿½ï¿½Å‚ï¿½ï¿½B
  
-\•¶‚Ì’è‹`‚ÍA‚Ù‚Æ‚ñ‚Çæ‚Éq‚×‚½Ž®e‚Ì’Ê‚è‚È‚Ì‚Å‚·‚ªAˆê“_‚¾‚¯’ˆÓ‚ª‚ ‚è‚Ü‚·BML‚Å‚ÍŽ®‚ð•À‚×‚é‚¾‚¯‚ÅŠÖ”“K—p‚É‚È‚é‚Ì‚ÅAx - y‚Æ‘‚¢‚½‚Æ‚«‚ÉAx ‚©‚çy‚ðˆø‚«ŽZ‚µ‚Ä‚¢‚é‚Ì‚©AŠÖ”x‚ðˆø”-y‚É“K—p‚µ‚Ä‚¢‚é‚Ì‚©AžB–†‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚Å‚·I@‚»‚±‚ÅAŠ‡ŒÊ‚ð‚Â‚¯‚È‚­‚Ä‚àŠÖ”‚Ìˆø”‚É‚È‚ê‚éŽ®simple_exp‚ÆAˆê”Ê‚ÌŽ®exp‚ð‹æ•Ê‚µ‚Ä‚¢‚Ü‚·B‚½‚Æ‚¦‚Î-y‚Ísimple_exp‚Å‚Í‚È‚¢‚Ì‚ÅAæ‚Ì—á‚ÍŠÖ”“K—p‚Å‚Í‚È‚­ˆø‚«ŽZ‚Å‚ ‚é‚Æ‚í‚©‚é‚í‚¯‚Å‚·B
+ï¿½\ï¿½ï¿½ï¿½Ì’ï¿½`ï¿½ÍAï¿½Ù‚Æ‚ï¿½Çï¿½Éqï¿½×‚ï¿½ï¿½ï¿½eï¿½Ì’Ê‚ï¿½È‚Ì‚Å‚ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó‚ï¿½ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½BMLï¿½Å‚ÍŽï¿½ï¿½ï¿½ï¿½ï¿½×‚é‚¾ï¿½ï¿½ï¿½ÅŠÖï¿½ï¿½Kï¿½pï¿½É‚È‚ï¿½Ì‚ÅAx - yï¿½Æï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ÉAx ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½Aï¿½Öï¿½xï¿½ï¿½ï¿½ï¿½-yï¿½É“Kï¿½pï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Ì‚ï¿½ï¿½Aï¿½Bï¿½ï¿½ï¿½É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½Ì‚Å‚ï¿½ï¿½Iï¿½@ï¿½ï¿½ï¿½ï¿½ï¿½ÅAï¿½ï¿½ï¿½Ê‚ï¿½ï¿½Â‚ï¿½ï¿½È‚ï¿½ï¿½Ä‚ï¿½ï¿½Öï¿½ï¿½Ìˆï¿½É‚È‚ï¿½éŽ®simple_expï¿½ÆAï¿½ï¿½Ê‚ÌŽï¿½expï¿½ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½-yï¿½ï¿½simple_expï¿½Å‚Í‚È‚ï¿½ï¿½Ì‚ÅAï¿½ï¿½Ì—ï¿½ÍŠÖï¿½ï¿½Kï¿½pï¿½Å‚Í‚È‚ï¿½ï¿½ï¿½Zï¿½Å‚ï¿½ï¿½ï¿½Æ‚í‚©ï¿½ï¿½í‚¯ï¿½Å‚ï¿½ï¿½B
  
-‚Ü‚½A‚¢‚ë‚¢‚ë‚È\•¶‚â“ñˆø”‰‰ŽZŽq‚Ì—Dæ‡ˆÊAilexer.mll‚Åo‚Ä‚«‚½jŽš‹å‚ð•\‚·ƒf[ƒ^Œ^‚àparser.mly‚Å’è‹`‚³‚ê‚Ä‚¢‚Ü‚·B
+ï¿½Ü‚ï¿½ï¿½Aï¿½ï¿½ï¿½ë‚¢ï¿½ï¿½È\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½qï¿½Ì—Dï¿½æ‡ï¿½ÊAï¿½ilexer.mllï¿½Åoï¿½Ä‚ï¿½ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½^ï¿½ï¿½parser.mlyï¿½Å’ï¿½`ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B
  
-‚È‚¨A•Ï”‚ÌŒ^‚ª•K—v‚È‚Æ‚±‚ëilet‚È‚Çj‚ÍA‚Æ‚è‚ ‚¦‚¸–¢’è‹`‚ÌV‚µ‚¢Œ^•Ï”Var(ref None)‚Å–„‚ß‚Ä‚¢‚Ü‚·B‚±‚ê‚É‚Â‚¢‚Ä‚ÍŽŸ‚ÌŒ^„˜_‚Åq‚×‚Ü‚·B
+ï¿½È‚ï¿½ï¿½Aï¿½Ïï¿½ï¿½ÌŒ^ï¿½ï¿½ï¿½Kï¿½vï¿½È‚Æ‚ï¿½ï¿½ï¿½iletï¿½È‚Çjï¿½ÍAï¿½Æ‚è‚ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½ÌVï¿½ï¿½ï¿½ï¿½ï¿½^ï¿½Ïï¿½Var(ref None)ï¿½Å–ï¿½ï¿½ß‚Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½Bï¿½ï¿½ï¿½ï¿½É‚Â‚ï¿½ï¿½Ä‚ÍŽï¿½ï¿½ÌŒ^ï¿½ï¿½ï¿½_ï¿½Åqï¿½×‚Ü‚ï¿½ï¿½B
  
 */
   import java.io.*;
 %}
 
-/* Žš‹å‚ð•\‚·ƒf[ƒ^Œ^‚Ì’è‹` (caml2html: parser_token) */
+/* ï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½^ï¿½Ì’ï¿½` (caml2html: parser_token) */
 %token <obj> BOOL
 %token <ival> INT
 %token <dval> FLOAT
@@ -60,7 +60,7 @@ parser.mly‚Ì’†g‚Ílexer.mll‚Æ—ÞŽ—‚µ‚Ä‚¨‚èAŽš‹å‚Ì—ñ‚©‚ç\•¶–Ø‚ð•\‚·ƒf[ƒ^Œ^‚Ö‚Ìƒ
 %token RPAREN
 %token EOF
 
-/* —Dæ‡ˆÊ‚Æassociativity‚Ì’è‹`i’á‚¢•û‚©‚ç‚‚¢•û‚Öj (caml2html: parser_prior) */
+/* ï¿½Dï¿½æ‡ï¿½Ê‚ï¿½associativityï¿½Ì’ï¿½`ï¿½iï¿½á‚¢ï¿½ï¿½ç‚ï¿½ï¿½ï¿½ï¿½Öj (caml2html: parser_prior) */
 %right prec_let
 %right SEMICOLON
 %right prec_if
@@ -73,14 +73,14 @@ parser.mly‚Ì’†g‚Ílexer.mll‚Æ—ÞŽ—‚µ‚Ä‚¨‚èAŽš‹å‚Ì—ñ‚©‚ç\•¶–Ø‚ð•\‚·ƒf[ƒ^Œ^‚Ö‚Ìƒ
 %left prec_app
 %left DOT
 
-/* ŠJŽn‹L†‚Ì’è‹` */
+/* ï¿½Jï¿½nï¿½Lï¿½ï¿½ï¿½Ì’ï¿½` */
 %type <obj> exp simple_exp fundef actual_args elems pat
 %type <obj> formal_args
 %start exp
 
 %%
 
-simple_exp /* Š‡ŒÊ‚ð‚Â‚¯‚È‚­‚Ä‚àŠÖ”‚Ìˆø”‚É‚È‚ê‚éŽ® (caml2html: parser_simple) */
+simple_exp /* ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½Â‚ï¿½ï¿½È‚ï¿½ï¿½Ä‚ï¿½ï¿½Öï¿½ï¿½Ìˆï¿½É‚È‚ï¿½éŽ® (caml2html: parser_simple) */
 : LPAREN exp RPAREN
     { $$ = $2; }
 | LPAREN RPAREN
@@ -95,7 +95,7 @@ simple_exp /* Š‡ŒÊ‚ð‚Â‚¯‚È‚­‚Ä‚àŠÖ”‚Ìˆø”‚É‚È‚ê‚éŽ® (caml2html: parser_simple) 
 | simple_exp DOT LPAREN exp RPAREN
     { $$ = new Get((T)$1, (T)$4); }
 
-exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
+exp /* ï¿½ï¿½Ê‚ÌŽï¿½ (caml2html: parser_exp) */
 : simple_exp
     { $$ = $1; }
 | NOT exp
@@ -106,12 +106,12 @@ exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
     {
         if ($2 instanceof Syntax.Float) {
             $$ = new Syntax.Float(-((Syntax.Float)$2).a());
-            // -1.23‚È‚Ç‚ÍŒ^ƒGƒ‰[‚Å‚Í‚È‚¢‚Ì‚Å•Êˆµ‚¢
+            // -1.23ï¿½È‚Ç‚ÍŒ^ï¿½Gï¿½ï¿½ï¿½[ï¿½Å‚Í‚È‚ï¿½ï¿½Ì‚Å•Êˆï¿½ï¿½ï¿½
         } else {
             $$ = new Neg((T)$2);
         }
     }
-| exp PLUS exp /* ‘«‚µŽZ‚ð\•¶‰ðÍ‚·‚éƒ‹[ƒ‹ (caml2html: parser_add) */
+| exp PLUS exp /* ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½éƒ‹ï¿½[ï¿½ï¿½ (caml2html: parser_add) */
     { $$ = new Add((T)$1, (T)$3); }
 | exp MINUS exp
     { $$ = new Sub((T)$1, (T)$3); }
@@ -149,7 +149,7 @@ exp /* ˆê”Ê‚ÌŽ® (caml2html: parser_exp) */
     { $$ = new LetRec((Fundef)$3, (T)$5); }
 | exp actual_args
     %prec prec_app
-    { $$ = app((T)$1, (scala.List<T>)$2); }
+        { $$ = app((T)$1, (scala.List<T>)$2); }
 | elems
     { System.out.println($1); $$ = tuple((scala.List<T>)$1); }
 | LET LPAREN pat RPAREN EQUAL exp IN exp

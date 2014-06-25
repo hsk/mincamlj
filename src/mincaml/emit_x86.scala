@@ -370,6 +370,8 @@ object Emit_x86 extends X86Asm {
 		p.asInstanceOf[Prog] match {
 		case Prog(data, fundefs, e) =>
 			println("generating assembly...@.");
+                        asm._cstring();
+
 			asm._section(".rodata");
 			asm._align(8);
 			data.foreach {
@@ -407,6 +409,9 @@ object Emit_x86 extends X86Asm {
 }
 
 class Asm(p:PrintWriter) {
+        def _cstring() {
+          p.println("\t.cstring");
+        }
 	def _section(r1:String) {
 		p.println("\t.section\t" + r1)
 	}

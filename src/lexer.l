@@ -1,18 +1,18 @@
 /*
-�������(lexer.mll)
+字句解析(lexer.mll)
  
-����ԥ塼���ˤȤäƤϡ�ML�ץ������Ȥ����ɤ⡢�Ϥ���Ϥ�����ʸ����Ǥ������Ȥ��Ф��ä���gcd���ä��顢
-��l�ס�e�ס�t�ס� �ס�r�ס�e�ס�c�ס� �ס�g�ס�c�ס�d�ס� �ס�m�ס� �ס�n�ס� �ס�=��...
-�Τ褦�˸�����櫓�Ǥ������ΤޤޤǤϲ���Ǥ��ʤ��Τǡ��ޤ�
-��let�ס�rec�ס�gcd�ס�m�ס�n�ס�=��...
-�Τ褦�ʻ���˶��ڤ�ޤ������ν����������ϤȤ����ޤ���
+コンピュータにとっては、MLプログラムといえども、はじめはただの文字列です。たとえばさっきのgcdだったら、
+「l」「e」「t」「 」「r」「e」「c」「 」「g」「c」「d」「 」「m」「 」「n」「 」「=」...
+のように見えるわけです。このままでは何もできないので、まず
+「let」「rec」「gcd」「m」「n」「=」...
+のような字句に区切ります。この処理を字句解析といいます。
  
-������ϤˤϤ�����������ˡ������ޤ����������Ǥ�ocamllex�Ȥ������ޤ���OCaml�ǻ�����Ϥ򤹤뤿��Υġ�������Ѥ��ޤ������Υե����뤬lexer.mll�Ǥ���ocamllex�ˤĤ��Ƥξܺ٤ϥޥ˥奢��ʤʤ��������ˤ򻲾Ȥ��Ƥ�餦���Ȥˤ��ơ����פ�����������ȡ�
+字句解析にはいろいろな方法がありますが、ここではocamllexという、まさにOCamlで字句解析をするためのツールを利用します。そのファイルがlexer.mllです。ocamllexについての詳細はマニュアル（ないし和訳）を参照してもらうことにして、概要だけ説明すると、
  
 | '-'? digit+
     { INT(int_of_string (Lexing.lexeme lexbuf)) }
  
-�Ȥ��ä��ѥ�����ޥå��󥰤Τ褦�ʹ�ʸ�ˤ�ꡢ������ɽ��'-'? digit+�˥ޥå����������INT���֤������Υ롼����¤٤ƽ񤱤�OK�Ǥ��������ɽ���ǡ�������INT�ʤɡˤϡ����˽Ҥ٤�parser.mly���������Ƥ��ޤ���Lexing.lexeme lexbuf�Ȥ�����ʬ�ϡ��������ʸ�����ɽ���֤��ޤ��ʤ��פ��ȻפäƤ���������
+といったパターンマッチングのような構文により、「正規表現'-'? digit+にマッチしたら字句INTを返す」等のルールを並べて書けばOKです。字句を表すデータ型（INTなど）は、次に述べるparser.mlyで定義されています。Lexing.lexeme lexbufという部分は、解析中の文字列を表す「おまじない」だと思ってください。
  
 */
 package mincaml;
@@ -53,19 +53,19 @@ let = let
 %%
 
 {space}+ {} // { token lexbuf } skip
-"(*" {} // { comment lexbuf; token lexbuf } // �ͥ��Ȥ��������ȤΤ���Υȥ�å�
+"(*" {} // { comment lexbuf; token lexbuf } // ネストしたコメントのためのトリック
 "(" { return Parser.LPAREN; }
 ")" { return Parser.RPAREN; }
 "true"  { yyparser.yylval = new ParserVal(new Boolean(true)); return Parser.BOOL; }
 "false" { yyparser.yylval = new ParserVal(new Boolean(false)); return Parser.BOOL; }
 "not"   { return Parser.NOT; }
-{digit}+ // �����������Ϥ���롼�� (caml2html: lexer_int)
+{digit}+ // 整数を字句解析するルール (caml2html: lexer_int)
     { yyparser.yylval = new ParserVal(Integer.parseInt(yytext())); return Parser.INT; }
 {digit}+ ("." {digit}*)? ([eE] [+-]? {digit}+)?
     { yyparser.yylval = new ParserVal(Double.parseDouble(yytext())); return Parser.FLOAT; }
-"-" // -.����󤷤ˤ��ʤ��Ƥ��ɤ�? ��Ĺ����?
+"-" // -.より後回しにしなくても良い? 最長一致?
     { return Parser.MINUS; }
-"+" // +.����󤷤ˤ��ʤ��Ƥ��ɤ�? ��Ĺ����?
+"+" // +.より後回しにしなくても良い? 最長一致?
     { return Parser.PLUS; }
 "-."
     { return Parser.MINUS_DOT; }
@@ -95,7 +95,8 @@ let = let
     { return Parser.ELSE; }
 "let"
     { return Parser.LET; }
-
+
+
 "in"
     { return Parser.IN; }
 "rec"
@@ -114,7 +115,7 @@ let = let
     { return Parser.SEMICOLON; }
 <<EOF>>
     { /*return Parser.EOF;*/ return YYEOF;}
-{lower} ({digit}|{lower}|{upper}|"_")* // ¾�Ρ�ͽ���פ���Ǥʤ��Ȥ����ʤ� *)
+{lower} ({digit}|{lower}|{upper}|"_")* // 他の「予約語」より後でないといけない *)
     { yyparser.yylval = new ParserVal(""+yytext()); return Parser.IDENT;  }
 
 

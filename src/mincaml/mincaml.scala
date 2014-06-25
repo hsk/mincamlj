@@ -1,3 +1,5 @@
+package mincaml;
+
 class Parse extends Syntax {
 	def g(x:Any):T = x match {
 		case () => Unit()
@@ -14,28 +16,28 @@ class Parse extends Syntax {
 		case (a, ".*", b) => FMul(g(a),g(b))
 		case (a, "./", b) => FDiv(g(a),g(b))
 		case (a, "==", b) => Eq(g(a), g(b))
-		case (a, "!=", b) => Le(g(a), g(b))
+		case (a, "!=", b) => LE(g(a), g(b))
 		case ("if", "(", a, ")", (b, "else", c)) => If(g(a), g(b), g(c))
 		case ("if", "(", a, ")", b) => If(g(a), g(b), Unit())
-		case ("let", (a, "=", b)) => Let((g(a), Type.gentyp()), g(a), g(b))
+		case ("let", (a:String, "=", b)) => Let((a, Type.gentyp()), g(a), g(b))
 		case b:String => Var(b)
-		case ("letrec", ((name,"(",p,")"), "=", body)) =>
+		case ("letrec", ((name:String,"(",p,")"), "=", body)) =>
 			LetRec(
 				Fundef(
-					(Id.T(name),Type.gentyp()),
+					(name,Type.gentyp()),
 					paramlist(p),
 					g(body)
 				), g(b)
 			)
 		case (a, "=", b) => App(g(a), g(b))
 		case ("(", r@(a, ",", b) , ")") => Tuple(tuplelist(r))
-		case ("let",( ("(",a,")"), "=", b,)) => LetTuple(paramlist(a) ,b), c))
+		case ("let",( ("(",a,")"), "=", b)) => LetTuple((paramlist(a) ,b), c)
 		case (a, "=", b) => Array(g(a), g(b))
 		case (a, "=", b) => Get(g(a), g(b))
 		case (a, "=", b) => Put(g(a), g(b), g(c))
 	}
-	def paramlist(x:Any):List[Var] = x match {
-		case a:String  => List(Var(Id.T(a)))
+	def paramlist(x:Any):List[(Id.T,Type.T)] = x match {
+		case a:String  => List((a,Var(None)))
 		case (a,",",b) => paramlist(a) ::: paramlist(b)
 		case _         => throw new Exception("error")
 	}
